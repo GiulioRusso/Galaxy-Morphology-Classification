@@ -1,0 +1,20 @@
+Best parameters: {'criterion': 'entropy', 'max_depth': None, 'n_estimators': 30}
+Best score: 0.751
+Cross-validation scores: [72.22 76.57 74.88 74.05 74.54 74.78 73.33 75.91 75.83 74.21]%
+Mean cross-validation score: 74.63 %
+Standard deviation of cross-validation scores: 1.22 %
+Accuracy for each class:
+Class 0: 29.20 %
+Class 1: 83.62 %
+Class 2: 87.74 %
+Class 3: 84.93 %
+
+Accuracy on the entire dataset: 76.37 %
+
+Precision - Recall - F1 for each class:
+Class 0: precision 0.70 / recall 0.29 / F1 0.41
+Class 1: precision 0.81 / recall 0.84 / F1 0.82
+Class 2: precision 0.71 / recall 0.88 / F1 0.78
+Class 3: precision 0.86 / recall 0.85 / F1 0.85
+
+Weighted mean: Precision 0.76 / Recall 0.76 / F1 0.75

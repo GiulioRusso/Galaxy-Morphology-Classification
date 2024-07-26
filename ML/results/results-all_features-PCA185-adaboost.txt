@@ -1,0 +1,32 @@
+Best parameters: {'algorithm': 'SAMME.R', 'learning_rate': 0.1, 'n_estimators': 450}
+Best score: 0.523
+Cross-validation scores: [51.05 52.25 52.25 50.68 51.17 51.81 53.91 52.86 52.46 54.55]%
+Mean cross-validation score: 52.3 %
+Standard deviation of cross-validation scores: 1.17 %
+Accuracy for each class:
+Class 0: 3.09 %
+Class 1: 39.03 %
+Class 2: 58.31 %
+Class 3: 77.47 %
+Class 4: 13.00 %
+Class 5: 40.62 %
+Class 6: 34.67 %
+Class 7: 64.21 %
+Class 8: 53.86 %
+Class 9: 72.06 %
+
+Accuracy on the entire dataset: 51.77 %
+
+Precision - Recall - F1 for each class:
+Class 0: precision 0.34 / recall 0.03 / F1 0.06
+Class 1: precision 0.55 / recall 0.39 / F1 0.46
+Class 2: precision 0.76 / recall 0.58 / F1 0.66
+Class 3: precision 0.52 / recall 0.77 / F1 0.63
+Class 4: precision 0.57 / recall 0.13 / F1 0.21
+Class 5: precision 0.47 / recall 0.41 / F1 0.44
+Class 6: precision 0.40 / recall 0.35 / F1 0.37
+Class 7: precision 0.37 / recall 0.64 / F1 0.47
+Class 8: precision 0.68 / recall 0.54 / F1 0.60
+Class 9: precision 0.62 / recall 0.72 / F1 0.67
+
+Weighted mean: Precision 0.53 / Recall 0.52 / F1 0.50

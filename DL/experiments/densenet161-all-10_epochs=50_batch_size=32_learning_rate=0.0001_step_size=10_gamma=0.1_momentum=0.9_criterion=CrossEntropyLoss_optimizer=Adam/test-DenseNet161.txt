@@ -1,0 +1,223 @@
+----------------------------------
+Dataset shape: 17733 elements     |
+----------------------------------
+Training set length: 8876         |
+Validation set length: 3552       |
+Test set length: 5305             |
+----------------------------------
+Class | Train | Validation | Test |
+----------------------------------
+  0   |  539  |    216     | 326  |
+  1   |  927  |    372     | 554  |
+  2   |  1323 |    530     | 792  |
+  3   |  1015 |    405     | 607  |
+  4   |  168  |    67      | 99   |
+  5   |  1023 |    409     | 611  |
+  6   |  916  |    367     | 545  |
+  7   |  1314 |    526     | 787  |
+  8   |  713  |    285     | 424  |
+  9   |  938  |    375     | 560  |
+----------------------------------
+
+----------------------------------
+             TEST MODE            |
+----------------------------------
+
+Loaded test_mode model: densenet161-all|epochs=50|batch_size=32|learning_rate=0.0001|step_size=10|gamma=0.1|momentum=0.9|criterion=CrossEntropyLoss|optimizer=Adam 
+Best accuracy: 78.41 % at epoch 30 
+
+... testing ...
+>>> batch 1 / 166 | Time: 0 s 
+>>> batch 2 / 166 | Time: 0 s 
+>>> batch 3 / 166 | Time: 0 s 
+>>> batch 4 / 166 | Time: 0 s 
+>>> batch 5 / 166 | Time: 0 s 
+>>> batch 6 / 166 | Time: 0 s 
+>>> batch 7 / 166 | Time: 0 s 
+>>> batch 8 / 166 | Time: 0 s 
+>>> batch 9 / 166 | Time: 0 s 
+>>> batch 10 / 166 | Time: 0 s 
+>>> batch 11 / 166 | Time: 0 s 
+>>> batch 12 / 166 | Time: 0 s 
+>>> batch 13 / 166 | Time: 0 s 
+>>> batch 14 / 166 | Time: 0 s 
+>>> batch 15 / 166 | Time: 0 s 
+>>> batch 16 / 166 | Time: 0 s 
+>>> batch 17 / 166 | Time: 0 s 
+>>> batch 18 / 166 | Time: 0 s 
+>>> batch 19 / 166 | Time: 0 s 
+>>> batch 20 / 166 | Time: 0 s 
+>>> batch 21 / 166 | Time: 0 s 
+>>> batch 22 / 166 | Time: 0 s 
+>>> batch 23 / 166 | Time: 0 s 
+>>> batch 24 / 166 | Time: 0 s 
+>>> batch 25 / 166 | Time: 0 s 
+>>> batch 26 / 166 | Time: 0 s 
+>>> batch 27 / 166 | Time: 0 s 
+>>> batch 28 / 166 | Time: 0 s 
+>>> batch 29 / 166 | Time: 0 s 
+>>> batch 30 / 166 | Time: 0 s 
+>>> batch 31 / 166 | Time: 0 s 
+>>> batch 32 / 166 | Time: 0 s 
+>>> batch 33 / 166 | Time: 0 s 
+>>> batch 34 / 166 | Time: 0 s 
+>>> batch 35 / 166 | Time: 0 s 
+>>> batch 36 / 166 | Time: 0 s 
+>>> batch 37 / 166 | Time: 0 s 
+>>> batch 38 / 166 | Time: 0 s 
+>>> batch 39 / 166 | Time: 0 s 
+>>> batch 40 / 166 | Time: 0 s 
+>>> batch 41 / 166 | Time: 0 s 
+>>> batch 42 / 166 | Time: 0 s 
+>>> batch 43 / 166 | Time: 0 s 
+>>> batch 44 / 166 | Time: 0 s 
+>>> batch 45 / 166 | Time: 0 s 
+>>> batch 46 / 166 | Time: 0 s 
+>>> batch 47 / 166 | Time: 0 s 
+>>> batch 48 / 166 | Time: 0 s 
+>>> batch 49 / 166 | Time: 0 s 
+>>> batch 50 / 166 | Time: 0 s 
+>>> batch 51 / 166 | Time: 0 s 
+>>> batch 52 / 166 | Time: 0 s 
+>>> batch 53 / 166 | Time: 0 s 
+>>> batch 54 / 166 | Time: 0 s 
+>>> batch 55 / 166 | Time: 0 s 
+>>> batch 56 / 166 | Time: 0 s 
+>>> batch 57 / 166 | Time: 0 s 
+>>> batch 58 / 166 | Time: 0 s 
+>>> batch 59 / 166 | Time: 0 s 
+>>> batch 60 / 166 | Time: 0 s 
+>>> batch 61 / 166 | Time: 0 s 
+>>> batch 62 / 166 | Time: 0 s 
+>>> batch 63 / 166 | Time: 0 s 
+>>> batch 64 / 166 | Time: 0 s 
+>>> batch 65 / 166 | Time: 0 s 
+>>> batch 66 / 166 | Time: 0 s 
+>>> batch 67 / 166 | Time: 0 s 
+>>> batch 68 / 166 | Time: 0 s 
+>>> batch 69 / 166 | Time: 0 s 
+>>> batch 70 / 166 | Time: 0 s 
+>>> batch 71 / 166 | Time: 0 s 
+>>> batch 72 / 166 | Time: 0 s 
+>>> batch 73 / 166 | Time: 0 s 
+>>> batch 74 / 166 | Time: 0 s 
+>>> batch 75 / 166 | Time: 0 s 
+>>> batch 76 / 166 | Time: 0 s 
+>>> batch 77 / 166 | Time: 0 s 
+>>> batch 78 / 166 | Time: 0 s 
+>>> batch 79 / 166 | Time: 0 s 
+>>> batch 80 / 166 | Time: 0 s 
+>>> batch 81 / 166 | Time: 0 s 
+>>> batch 82 / 166 | Time: 0 s 
+>>> batch 83 / 166 | Time: 0 s 
+>>> batch 84 / 166 | Time: 0 s 
+>>> batch 85 / 166 | Time: 0 s 
+>>> batch 86 / 166 | Time: 0 s 
+>>> batch 87 / 166 | Time: 0 s 
+>>> batch 88 / 166 | Time: 0 s 
+>>> batch 89 / 166 | Time: 0 s 
+>>> batch 90 / 166 | Time: 0 s 
+>>> batch 91 / 166 | Time: 0 s 
+>>> batch 92 / 166 | Time: 0 s 
+>>> batch 93 / 166 | Time: 0 s 
+>>> batch 94 / 166 | Time: 0 s 
+>>> batch 95 / 166 | Time: 0 s 
+>>> batch 96 / 166 | Time: 0 s 
+>>> batch 97 / 166 | Time: 0 s 
+>>> batch 98 / 166 | Time: 0 s 
+>>> batch 99 / 166 | Time: 0 s 
+>>> batch 100 / 166 | Time: 0 s 
+>>> batch 101 / 166 | Time: 0 s 
+>>> batch 102 / 166 | Time: 0 s 
+>>> batch 103 / 166 | Time: 0 s 
+>>> batch 104 / 166 | Time: 0 s 
+>>> batch 105 / 166 | Time: 0 s 
+>>> batch 106 / 166 | Time: 0 s 
+>>> batch 107 / 166 | Time: 0 s 
+>>> batch 108 / 166 | Time: 0 s 
+>>> batch 109 / 166 | Time: 0 s 
+>>> batch 110 / 166 | Time: 0 s 
+>>> batch 111 / 166 | Time: 0 s 
+>>> batch 112 / 166 | Time: 0 s 
+>>> batch 113 / 166 | Time: 0 s 
+>>> batch 114 / 166 | Time: 0 s 
+>>> batch 115 / 166 | Time: 0 s 
+>>> batch 116 / 166 | Time: 0 s 
+>>> batch 117 / 166 | Time: 0 s 
+>>> batch 118 / 166 | Time: 0 s 
+>>> batch 119 / 166 | Time: 0 s 
+>>> batch 120 / 166 | Time: 0 s 
+>>> batch 121 / 166 | Time: 0 s 
+>>> batch 122 / 166 | Time: 0 s 
+>>> batch 123 / 166 | Time: 0 s 
+>>> batch 124 / 166 | Time: 0 s 
+>>> batch 125 / 166 | Time: 0 s 
+>>> batch 126 / 166 | Time: 0 s 
+>>> batch 127 / 166 | Time: 0 s 
+>>> batch 128 / 166 | Time: 0 s 
+>>> batch 129 / 166 | Time: 0 s 
+>>> batch 130 / 166 | Time: 0 s 
+>>> batch 131 / 166 | Time: 0 s 
+>>> batch 132 / 166 | Time: 0 s 
+>>> batch 133 / 166 | Time: 0 s 
+>>> batch 134 / 166 | Time: 0 s 
+>>> batch 135 / 166 | Time: 0 s 
+>>> batch 136 / 166 | Time: 0 s 
+>>> batch 137 / 166 | Time: 0 s 
+>>> batch 138 / 166 | Time: 0 s 
+>>> batch 139 / 166 | Time: 0 s 
+>>> batch 140 / 166 | Time: 0 s 
+>>> batch 141 / 166 | Time: 0 s 
+>>> batch 142 / 166 | Time: 0 s 
+>>> batch 143 / 166 | Time: 0 s 
+>>> batch 144 / 166 | Time: 0 s 
+>>> batch 145 / 166 | Time: 0 s 
+>>> batch 146 / 166 | Time: 0 s 
+>>> batch 147 / 166 | Time: 0 s 
+>>> batch 148 / 166 | Time: 0 s 
+>>> batch 149 / 166 | Time: 0 s 
+>>> batch 150 / 166 | Time: 0 s 
+>>> batch 151 / 166 | Time: 0 s 
+>>> batch 152 / 166 | Time: 0 s 
+>>> batch 153 / 166 | Time: 0 s 
+>>> batch 154 / 166 | Time: 0 s 
+>>> batch 155 / 166 | Time: 0 s 
+>>> batch 156 / 166 | Time: 0 s 
+>>> batch 157 / 166 | Time: 0 s 
+>>> batch 158 / 166 | Time: 0 s 
+>>> batch 159 / 166 | Time: 0 s 
+>>> batch 160 / 166 | Time: 0 s 
+>>> batch 161 / 166 | Time: 0 s 
+>>> batch 162 / 166 | Time: 0 s 
+>>> batch 163 / 166 | Time: 0 s 
+>>> batch 164 / 166 | Time: 0 s 
+>>> batch 165 / 166 | Time: 0 s 
+>>> batch 166 / 166 | Time: 0 s 
+
+Accuracy for each class:
+Class 0: 18.10 %
+Class 1: 66.97 %
+Class 2: 90.03 %
+Class 3: 95.55 %
+Class 4: 0.00 %
+Class 5: 84.94 %
+Class 6: 53.39 %
+Class 7: 73.19 %
+Class 8: 97.64 %
+Class 9: 85.00 %
+
+Accuracy on the entire dataset: 75.38 %
+
+Precision - Recall - F1 for each class:
+Class 0: Precision 0.28 / Recall 0.18 / F1 0.22 
+Class 1: Precision 0.9 / Recall 0.67 / F1 0.77 
+Class 2: Precision 0.91 / Recall 0.9 / F1 0.9 
+Class 3: Precision 0.72 / Recall 0.96 / F1 0.82 
+Class 4: Precision 0.0 / Recall 0.0 / F1 0.0 
+Class 5: Precision 0.82 / Recall 0.85 / F1 0.84 
+Class 6: Precision 0.78 / Recall 0.53 / F1 0.63 
+Class 7: Precision 0.58 / Recall 0.73 / F1 0.65 
+Class 8: Precision 0.71 / Recall 0.98 / F1 0.82 
+Class 9: Precision 0.94 / Recall 0.85 / F1 0.89 
+
+Weighted mean: Precision 0.75 / Recall 0.75 / F1 0.74

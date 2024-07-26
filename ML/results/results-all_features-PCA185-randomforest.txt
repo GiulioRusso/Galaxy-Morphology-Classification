@@ -1,0 +1,32 @@
+Best parameters: {'criterion': 'gini', 'max_depth': None, 'n_estimators': 30}
+Best score: 0.5811
+Cross-validation scores: [56.04 57.57 60.39 58.18 56.24 57.13 58.66 59.31 58.66 57.61]%
+Mean cross-validation score: 57.98 %
+Standard deviation of cross-validation scores: 1.28 %
+Accuracy for each class:
+Class 0: 0.93 %
+Class 1: 64.57 %
+Class 2: 86.65 %
+Class 3: 79.77 %
+Class 4: 14.00 %
+Class 5: 44.54 %
+Class 6: 40.33 %
+Class 7: 47.97 %
+Class 8: 68.62 %
+Class 9: 69.75 %
+
+Accuracy on the entire dataset: 58.38 %
+
+Precision - Recall - F1 for each class:
+Class 0: precision 0.06 / recall 0.01 / F1 0.02
+Class 1: precision 0.62 / recall 0.65 / F1 0.63
+Class 2: precision 0.75 / recall 0.87 / F1 0.80
+Class 3: precision 0.69 / recall 0.80 / F1 0.74
+Class 4: precision 0.52 / recall 0.14 / F1 0.22
+Class 5: precision 0.47 / recall 0.45 / F1 0.46
+Class 6: precision 0.45 / recall 0.40 / F1 0.43
+Class 7: precision 0.41 / recall 0.48 / F1 0.44
+Class 8: precision 0.67 / recall 0.69 / F1 0.68
+Class 9: precision 0.64 / recall 0.70 / F1 0.67
+
+Weighted mean: Precision 0.55 / Recall 0.58 / F1 0.56

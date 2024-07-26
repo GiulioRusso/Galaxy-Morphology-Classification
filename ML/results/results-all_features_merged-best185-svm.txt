@@ -1,0 +1,20 @@
+Best parameters: {'C': 100, 'gamma': 0.001, 'kernel': 'rbf'}
+Best score: 0.8265
+Cross-validation scores: [80.68 83.25 83.17 82.68 82.11 84.05 82.92 82.92 82.27 82.43]%
+Mean cross-validation score: 82.65 %
+Standard deviation of cross-validation scores: 0.84 %
+Accuracy for each class:
+Class 0: 52.16 %
+Class 1: 88.15 %
+Class 2: 87.12 %
+Class 3: 91.10 %
+
+Accuracy on the entire dataset: 82.41 %
+
+Precision - Recall - F1 for each class:
+Class 0: precision 0.75 / recall 0.52 / F1 0.62
+Class 1: precision 0.83 / recall 0.88 / F1 0.86
+Class 2: precision 0.80 / recall 0.87 / F1 0.83
+Class 3: precision 0.90 / recall 0.91 / F1 0.91
+
+Weighted mean: Precision 0.82 / Recall 0.82 / F1 0.82
