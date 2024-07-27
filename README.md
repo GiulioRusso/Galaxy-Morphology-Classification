@@ -177,7 +177,7 @@ Class | Train | Validation | Test |
 
 <br>
 
-### On 3 classes
+### On 3 classes:
 
 Dataset shape        | 14799 elements    |
 ---------------------|-------------------|
@@ -199,7 +199,7 @@ A data augmentation process is done with flipping and mirroring operations:
 
 <img src="./images/data_augmentation.png" width="70%">
 
-### On the 10 classes
+### On the 10 classes:
 
 - Class 4: + 1001 images from 17733 to 18733
 - Class 0: + 406 images from 18734 to 19139
@@ -228,7 +228,7 @@ Class | Train | Validation | Test |
 
 Thus, we get the *all-10-augmented.csv*. 
 
-### On 4 classes
+### On 4 classes:
 
 In order to get the *all-4-augmented.csv* from *all-10-augmented.csv*:
 
@@ -254,7 +254,7 @@ Class | Train | Validation | Test |
 
 Thus, we get the *all-4-augmented.csv*. 
 
-### On 3 classes
+### On 3 classes:
 
 In order to get the *all-3-augmented.csv* from *all-4-augmented.csv*: Class 0 on 10 classes is included in Class 0 on 4 classes. So, if it is removed, respect of the *all-3.csv* not augmented, we get the 1001 samples more of class 4, which falls into Class 1 on 4 classes, which became Class 0 on 3 classes. Finally, the new *all-3-augmented.csv* has 14799 + 1001 = 15800.
 
