@@ -1,3 +1,6 @@
+> [!WARNING]
+> **Coursework version (2023).** Known issue: augmentation applied before splitting leaks augmented copies across train/val/test. In the 10-class set, 1407 rotated/flipped copies of 201 galaxies were added; 603 source/copy pairs sit in different splits, and 402 of the 5707 test images are copies of galaxies that are also in train (see [`scripts/audit_v1_leakage.csv`](scripts/audit_v1_leakage.csv), produced by [`scripts/audit_v1_leakage.py`](scripts/audit_v1_leakage.py)). Results below are optimistic. See [`main`](https://github.com/GiulioRusso/Galaxy-Morphology-Classification/tree/main) for v2.
+
 # Galaxy Morphology Classification
 Galaxy10DECaLS classification using handcrafted feature extraction with machine learning and data augmentation with Focal Loss on deep learning process in order to improve F1 score.
 
