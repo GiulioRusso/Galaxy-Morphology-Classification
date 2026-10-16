@@ -24,8 +24,9 @@ from galaxy10.data import CLASSES, Galaxy10
 from galaxy10.evaluate import PROB_COLS, evaluate_run
 
 DEFAULTS = dict(images="data/Galaxy10_DECals.npy", splits="splits", pretrained=True, loss="ce", sampler=False,
-                epochs=30, batch_size=64, lr=3e-4, weight_decay=0.05, patience=5, amp=True, num_workers=4,
-                limit=None, device=None, seeds=[0, 1, 2])
+                epochs=30, batch_size=32, lr=3e-4, weight_decay=0.05, patience=5, amp=True, num_workers=3,
+                limit=None, device=None, seeds=[0, 1, 2], grad_checkpointing=True,
+                mps_memory_fraction=0.4)
 
 
 def pick_device(name=None):
@@ -51,6 +52,11 @@ def predict(model, loader, device):
 def run(cfg, seed, run_dir, ckpt_dir):
     random.seed(seed), np.random.seed(seed), torch.manual_seed(seed)
     device = pick_device(cfg["device"])
+    if device.type == "mps":
+        # CPU and GPU share RAM on Apple silicon. PyTorch's default MPS limit (1.7x the recommended working set)
+        # can exceed physical memory, and macOS then freezes instead of raising OOM. Cap it (0.4 ~ 4.3 GB on a
+        # 16 GB Mac) so overuse raises an error instead.
+        torch.mps.set_per_process_memory_fraction(cfg["mps_memory_fraction"])
     amp = cfg["amp"] and device.type in ("mps", "cuda")
     split_csv = Path(cfg["splits"]) / f"galaxy10_seed{seed}.csv"
     ds = {s: Galaxy10(split_csv, s, cfg["images"], transforms.build(s == "train"), cfg["limit"])
@@ -66,9 +72,10 @@ def run(cfg, seed, run_dir, ckpt_dir):
     kw = dict(batch_size=cfg["batch_size"], num_workers=cfg["num_workers"],
               persistent_workers=cfg["num_workers"] > 0)
     train_dl = DataLoader(ds["train"], shuffle=sampler is None, sampler=sampler, drop_last=True, **kw)
-    val_dl, test_dl = (DataLoader(ds[s], **kw) for s in ("val", "test"))
+    val_dl = DataLoader(ds["val"], **kw)
 
     model = models.build(cfg["model"], len(CLASSES), cfg["pretrained"]).to(device)
+    model.set_grad_checkpointing(cfg["grad_checkpointing"])  # ResNet-50 bs32: 4.6 -> 2.5 GB on MPS, ~20% slower
     opt = torch.optim.AdamW(model.parameters(), lr=cfg["lr"], weight_decay=cfg["weight_decay"])
     sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=cfg["epochs"])
     scaler = torch.amp.GradScaler(device.type, enabled=amp)
@@ -103,8 +110,12 @@ def run(cfg, seed, run_dir, ckpt_dir):
                 break
     pd.DataFrame(log).to_csv(run_dir / "train_log.csv", index=False, float_format="%.5f")
 
+    del train_dl, val_dl  # shut down persistent workers before spawning the test loader
     model.load_state_dict(torch.load(ckpt_dir / "best.pt", map_location=device))
-    probs = predict(model, test_dl, device)
+    probs = predict(model, DataLoader(ds["test"], batch_size=cfg["batch_size"], num_workers=cfg["num_workers"]), device)
+    del model, opt
+    if device.type == "mps":
+        torch.mps.empty_cache()
     out = pd.DataFrame(probs, columns=PROB_COLS)
     out.insert(0, "label", ds["test"].labels)
     out.insert(0, "image_id", ds["test"].ids)

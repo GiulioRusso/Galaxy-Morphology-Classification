@@ -69,7 +69,7 @@ Published Galaxy10 DECaLS results report top-1 accuracy between about 73% and 95
 
 ## Reproduce
 
-Requires [uv](https://docs.astral.sh/uv/). Configs are sized for a 16 GB Apple-silicon laptop (MPS, fp16 autocast); CPU and CUDA also work.
+Requires [uv](https://docs.astral.sh/uv/). Configs are sized for a 16 GB Apple-silicon laptop (MPS, fp16 autocast, gradient checkpointing, batch 32); CPU and CUDA also work. On a Mac, keep it plugged in with Low Power Mode off (it throttles the GPU). GPU memory is capped with `mps_memory_fraction` (default 0.4), so a run that needs too much memory fails with an out-of-memory error instead of freezing the machine.
 
 ```bash
 make data                                   # download the h5 (2.7 GB, MD5-checked) and write splits

@@ -5,5 +5,5 @@ title: "B2 ConvNeXt-Tiny (ImageNet-12k→1k)"
 model: convnext_tiny.in12k_ft_in1k
 loss: weighted_ce
 sampler: false
-batch_size: 48
+batch_size: 32
 lr: 1.0e-4

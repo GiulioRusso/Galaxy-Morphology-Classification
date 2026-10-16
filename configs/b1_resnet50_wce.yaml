@@ -4,5 +4,5 @@ title: "B1 ResNet-50 (ImageNet), loss=weighted_ce, balanced sampler=false"
 model: resnet50.tv_in1k
 loss: weighted_ce
 sampler: false
-batch_size: 64
+batch_size: 32
 lr: 3.0e-4

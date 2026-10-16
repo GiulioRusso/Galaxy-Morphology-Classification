@@ -7,5 +7,5 @@ title: "B3 Zoobot ConvNeXt-Tiny (Galaxy Zoo)"
 model: hf_hub:mwalmsley/zoobot-encoder-convnext_tiny
 loss: weighted_ce
 sampler: false
-batch_size: 48
+batch_size: 32
 lr: 1.0e-4

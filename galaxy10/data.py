@@ -127,7 +127,7 @@ class Galaxy10(Dataset):
     def __getitem__(self, i):
         if self.images is None:
             self.images = np.load(self.images_path, mmap_mode="r")  # opened lazily, per DataLoader worker
-        return self.transform(self.images[self.ids[i]]), int(self.labels[i])
+        return self.transform(np.array(self.images[self.ids[i]])), int(self.labels[i])
 
 
 def main():
