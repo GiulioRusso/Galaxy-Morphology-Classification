@@ -10,6 +10,7 @@ from pathlib import Path
 
 URL = "https://zenodo.org/records/10845026/files/Galaxy10_DECals.h5"
 MD5 = "c6b7b4db82b3a5d63d6a7e3e5249b51c"  # from https://zenodo.org/api/records/10845026
+SIZE = 2735267419
 
 
 def md5(path):
@@ -26,8 +27,11 @@ def main():
     out = Path(p.parse_args().out) / "Galaxy10_DECals.h5"
     out.parent.mkdir(parents=True, exist_ok=True)
     tmp = out.with_suffix(".part")
-    for attempt in range(20):  # Zenodo connections sometimes hang: time out and resume from the partial file
+    for attempt in range(50):  # Zenodo connections hang or close early: time out and resume from the partial file
         if out.exists():
+            break
+        if tmp.exists() and tmp.stat().st_size == SIZE:
+            tmp.rename(out)
             break
         done = tmp.stat().st_size if tmp.exists() else 0
         print(f"downloading {URL} -> {out} (from byte {done}, attempt {attempt + 1})", flush=True)
@@ -35,9 +39,10 @@ def main():
         try:
             with urllib.request.urlopen(req, timeout=60) as r, open(tmp, "ab" if r.status == 206 else "wb") as f:
                 shutil.copyfileobj(r, f, length=1 << 20)
-            tmp.rename(out)
         except (OSError, TimeoutError) as e:
             print(f"interrupted: {e}", flush=True)
+    if not out.exists():
+        raise SystemExit(f"download incomplete ({tmp} kept); re-run to resume")
     got = md5(out)
     if got != MD5:
         raise SystemExit(f"MD5 mismatch for {out}: {got} != {MD5}. Delete it and re-run.")
