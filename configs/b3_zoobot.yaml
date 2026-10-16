@@ -1,0 +1,11 @@
+# Zoobot ConvNeXt-Tiny encoder, pretrained on GZ Evo (Galaxy Zoo volunteer votes).
+# Caveat: GZ Evo includes GZ DECaLS, the source of Galaxy10 DECaLS labels, so test galaxies were likely seen
+# (with their votes) during pretraining. See docs/related_work.md.
+# loss/sampler: set to the winner of the B1 imbalance study.
+name: b3_zoobot
+title: "B3 Zoobot ConvNeXt-Tiny (Galaxy Zoo)"
+model: hf_hub:mwalmsley/zoobot-encoder-convnext_tiny
+loss: weighted_ce
+sampler: false
+batch_size: 48
+lr: 1.0e-4
