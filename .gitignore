@@ -1,2 +1,16 @@
 .DS_Store
-.idea
+.idea/
+__pycache__/
+*.egg-info/
+.venv
+.venv*/
+data
+data/
+*.nosync
+*.h5
+*.pt
+*.ckpt
+outputs
+outputs/
+wandb/
+.ipynb_checkpoints/
