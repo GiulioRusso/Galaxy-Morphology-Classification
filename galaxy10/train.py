@@ -23,7 +23,7 @@ from galaxy10 import models, transforms
 from galaxy10.data import CLASSES, Galaxy10
 from galaxy10.evaluate import PROB_COLS, evaluate_run
 
-DEFAULTS = dict(h5="data/Galaxy10_DECals.h5", splits="splits", pretrained=True, loss="ce", sampler=False,
+DEFAULTS = dict(images="data/Galaxy10_DECals.npy", splits="splits", pretrained=True, loss="ce", sampler=False,
                 epochs=30, batch_size=64, lr=3e-4, weight_decay=0.05, patience=5, amp=True, num_workers=4,
                 limit=None, device=None, seeds=[0, 1, 2])
 
@@ -53,7 +53,7 @@ def run(cfg, seed, run_dir, ckpt_dir):
     device = pick_device(cfg["device"])
     amp = cfg["amp"] and device.type in ("mps", "cuda")
     split_csv = Path(cfg["splits"]) / f"galaxy10_seed{seed}.csv"
-    ds = {s: Galaxy10(split_csv, s, cfg["h5"], transforms.build(s == "train"), cfg["limit"])
+    ds = {s: Galaxy10(split_csv, s, cfg["images"], transforms.build(s == "train"), cfg["limit"])
           for s in ("train", "val", "test")}
 
     y = ds["train"].labels

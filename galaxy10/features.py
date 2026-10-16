@@ -12,7 +12,6 @@ from multiprocessing import Pool
 from pathlib import Path
 
 import cv2
-import h5py
 import numpy as np
 import pandas as pd
 from skimage.feature import graycomatrix, graycoprops, local_binary_pattern
@@ -88,17 +87,17 @@ def extract(rgb):
 _images = None
 
 
-def _init(h5_path):
+def _init(images_path):
     global _images
-    _images = h5py.File(h5_path, "r")["images"]
+    _images = np.load(images_path, mmap_mode="r")
 
 
 def _extract_id(i):
     return extract(_images[i])
 
 
-def compute(h5_path, ids, workers=None):
-    with Pool(workers, initializer=_init, initargs=(h5_path,)) as pool:
+def compute(images_path, ids, workers=None):
+    with Pool(workers, initializer=_init, initargs=(images_path,)) as pool:
         return np.stack(pool.map(_extract_id, ids, chunksize=64))
 
 
@@ -106,12 +105,12 @@ def run(cfg, seed, run_dir):
     df = pd.read_csv(Path(cfg["splits"]) / f"galaxy10_seed{seed}.csv")
     if cfg.get("limit"):
         df = df.groupby("split", group_keys=False).apply(lambda s: s.sample(min(cfg["limit"], len(s)), random_state=0))
-    cache = Path(cfg["h5"]).parent / "features.npz"
+    cache = Path(cfg["images"]).parent / "features.npz"
     if cache.exists() and np.isin(df.image_id, np.load(cache)["ids"]).all():
         z = np.load(cache)
         X = pd.DataFrame(z["X"], index=z["ids"]).loc[df.image_id].to_numpy()
     else:
-        X = compute(cfg["h5"], df.image_id.to_numpy())
+        X = compute(cfg["images"], df.image_id.to_numpy())
         if not cfg.get("limit"):
             np.savez(cache, ids=df.image_id.to_numpy(), X=X)
     tr, va, te = (df.split == s for s in ("train", "val", "test"))

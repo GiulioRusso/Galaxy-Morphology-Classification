@@ -3,7 +3,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from tests.conftest import BLACK, DUP
+from tests.conftest import BLACK, DUP, TWIN
 
 COMMITTED = sorted(Path(__file__).resolve().parents[1].glob("splits/galaxy10_seed*.csv"))
 
@@ -24,6 +24,6 @@ def test_committed_splits(path):
 def test_fake_splits(fake):
     df = pd.read_csv(fake["splits"] / "galaxy10_seed0.csv")
     check(df)
-    assert not df.image_id.isin(BLACK).any()
-    assert pd.read_csv(fake["splits"] / "dropped.csv").image_id.tolist() == BLACK
+    assert not df.image_id.isin(BLACK + list(TWIN)).any()
+    assert pd.read_csv(fake["splits"] / "dropped.csv").image_id.tolist() == sorted(BLACK + list(TWIN))
     assert df.set_index("image_id").loc[list(DUP), "split"].nunique() == 1

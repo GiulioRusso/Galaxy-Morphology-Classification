@@ -2,7 +2,8 @@
 
     python scripts/make_results_table.py
 
-Markers: HEADLINE, RESULTS, PERCLASS. The headline/per-class model is the one with the best mean
+Markers: DATASET (class counts from splits/), HEADLINE, RESULTS, PERCLASS.
+The headline/per-class model is the one with the best mean
 *validation* macro-F1, so test numbers never drive model selection.
 """
 import re
@@ -53,14 +54,27 @@ def render(df):
     return headline, "\n".join(lines), "\n".join(per)
 
 
+def dataset_table(splits=ROOT / "splits"):
+    kept = pd.read_csv(splits / "galaxy10_seed0.csv")
+    dropped = pd.read_csv(splits / "dropped.csv")
+    n_kept = kept.label.value_counts().reindex(range(len(CLASSES)), fill_value=0)
+    n_drop = dropped.label.value_counts().reindex(range(len(CLASSES)), fill_value=0)
+    lines = ["| Class | Name | Release | Used |", "|---|---|---|---|"]
+    lines += [f"| {k} | {c} | {n_kept[k] + n_drop[k]} | {n_kept[k]} |" for k, c in enumerate(CLASSES)]
+    lines.append(f"| | **Total** | **{len(kept) + len(dropped)}** | **{len(kept)}** |")
+    reasons = ", ".join(f"{n} {r}" for r, n in dropped.reason.value_counts().items())
+    return "\n".join(lines) + f"\n\nDropped ({len(dropped)}): {reasons}. List: `splits/dropped.csv`."
+
+
 def write(text, marker, body):
-    pat = re.compile(rf"(<!-- {marker}:START -->\n).*?(\n<!-- {marker}:END -->)", re.S)
+    pat = re.compile(rf"(<!-- {marker}:START -->\n).*?(<!-- {marker}:END -->)", re.S)
     assert pat.search(text), f"README is missing the {marker} markers"
-    return pat.sub(lambda m: m.group(1) + body + m.group(2), text)
+    return pat.sub(lambda m: m.group(1) + body + "\n" + m.group(2), text)
 
 
 def main():
     text = README.read_text()
+    text = write(text, "DATASET", dataset_table())
     for marker, body in zip(["HEADLINE", "RESULTS", "PERCLASS"], render(load())):
         text = write(text, marker, body)
     README.write_text(text)

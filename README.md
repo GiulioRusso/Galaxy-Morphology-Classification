@@ -10,33 +10,38 @@ _No results yet: run `make train CONFIG=...` then `make table`._
 
 ## Task and dataset
 
-[Galaxy10 DECaLS](https://astronn.readthedocs.io/en/latest/galaxy10.html) contains 17,736 colour cutouts (256×256, g/r/z bands) from the DESI Legacy Imaging Surveys. The labels come from Galaxy Zoo DECaLS volunteer votes. All 10 classes are kept:
+[Galaxy10 DECaLS](https://astronn.readthedocs.io/en/latest/galaxy10.html) contains 17,736 colour cutouts (256×256, g/r/z bands) from the DESI Legacy Imaging Surveys. The labels come from Galaxy Zoo DECaLS volunteer votes. All 10 classes are kept. Counts are generated from `splits/`:
 
-| Class | Name | Images |
-|---|---|---|
-| 0 | Disturbed | 1081 |
-| 1 | Merging | 1853 |
-| 2 | Round Smooth | 2645 |
-| 3 | In-between Round Smooth | 2027 |
-| 4 | Cigar Shaped Smooth | 334 |
-| 5 | Barred Spiral | 2043 |
-| 6 | Unbarred Tight Spiral | 1828 |
-| 7 | Unbarred Loose Spiral | 2627 |
-| 8 | Edge-on without Bulge | 1422 |
-| 9 | Edge-on with Bulge | 1873 |
+<!-- DATASET:START -->
+| Class | Name | Release | Used |
+|---|---|---|---|
+| 0 | Disturbed | 1081 | 1051 |
+| 1 | Merging | 1853 | 1839 |
+| 2 | Round Smooth | 2645 | 2635 |
+| 3 | In-between Round Smooth | 2027 | 2021 |
+| 4 | Cigar Shaped Smooth | 334 | 333 |
+| 5 | Barred Spiral | 2043 | 2038 |
+| 6 | Unbarred Tight Spiral | 1829 | 1819 |
+| 7 | Unbarred Loose Spiral | 2628 | 2595 |
+| 8 | Edge-on no Bulge | 1423 | 1419 |
+| 9 | Edge-on with Bulge | 1873 | 1865 |
+| | **Total** | **17736** | **17615** |
 
-The counts above exclude three all-black images, which are dropped automatically (see `splits/dropped.csv`).
+Dropped (121): 118 identical, conflicting labels, 3 blank. List: `splits/dropped.csv`.
+<!-- DATASET:END -->
+
+"Identical, conflicting labels": the release contains 59 pairs of pixel-identical images, and in every pair the two copies carry different classes. Neither label can be trusted, so both copies are dropped. "Blank": images with a single constant pixel value.
 
 ## What changed from v1
 
 The 2023 coursework version (branch [`legacy/v1`](https://github.com/GiulioRusso/Galaxy-Morphology-Classification/tree/legacy/v1), tag `v1-coursework`) wrote rotated and flipped copies of minority-class images to disk *before* splitting. Each galaxy's 7 copies were then spread over train, validation and test. In the 10-class set, 402 of the 5,707 test images were copies of galaxies that were also in the training set. The audit is in [`scripts/audit_v1_leakage.py`](https://github.com/GiulioRusso/Galaxy-Morphology-Classification/blob/legacy/v1/scripts/audit_v1_leakage.py) and [its output](https://github.com/GiulioRusso/Galaxy-Morphology-Classification/blob/legacy/v1/scripts/audit_v1_leakage.csv). v1 also dropped the hardest class (Disturbed + Merging) from its 3-class setting.
 
-v2 splits before any augmentation, keeps all 10 classes, and treats duplicate observations of the same galaxy as one unit.
+v2 splits before any augmentation, keeps all 10 classes, removes conflicting duplicate images, and keeps overlapping cutouts of the same sky region in the same split.
 
 ## Data protocol
 
-- **Black images:** detected by a pixel check and logged, not hardcoded.
-- **Duplicates:** images within 2″ of each other on the sky are the same galaxy. They share a group, and a group never spans two splits.
+- **Cleaning:** blank images and pixel-identical copies with conflicting labels are found by pixel checks and logged, not hardcoded.
+- **Overlap groups:** cutouts within 60″ of each other on the sky overlap and share pixels (measured correlation on the overlap ≈ 0.94–0.99). They form one group, and a group never spans two splits.
 - **Splits:** stratified 70/15/15 by galaxy group for seeds 0, 1 and 2, committed as `splits/galaxy10_seed{N}.csv`. Tests check disjointness and that every class appears in every split.
 - **Augmentation:** applied on the fly to training images only. It uses the D4 dihedral group (90° rotations × flips; galaxies have no preferred orientation), a random 224 crop from the 256 image, and mild brightness and contrast jitter.
 - **Model selection:** early stopping and model choice use validation macro-F1. The test set is read once per run.
