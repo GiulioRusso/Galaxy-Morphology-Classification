@@ -13,7 +13,7 @@ debug:
 	$(RUN) python -m galaxy10.train $(CONFIG) --debug --seeds 0
 
 eval:
-	$(RUN) python -m galaxy10.evaluate $(CONFIG) --figures
+	$(RUN) python -m galaxy10.evaluate $(CONFIG) --figures $(if $(RESULTS),--results $(RESULTS))
 
 table:
 	$(RUN) python scripts/make_results_table.py

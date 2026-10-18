@@ -1,6 +1,9 @@
 """Metrics from a run's test_probs.csv -> metrics.csv (+ optional figures).
 
-    python -m galaxy10.evaluate configs/b1_resnet50.yaml [--figures]
+    python -m galaxy10.evaluate configs/b1_resnet50_wce.yaml [--figures]
+
+--figures writes, per seed: confusion_matrix.png, reliability.png, curves.png (train/val loss, val macro-F1),
+examples.png (per class: most confident correct and most confident wrong test images).
 """
 import argparse
 from pathlib import Path
@@ -50,11 +53,14 @@ def load_probs(path):
     return df.label.to_numpy(), df[PROB_COLS].to_numpy()
 
 
-def figures(y, probs, out_dir):
+def figures(run_dir, images_path=None):
     import matplotlib
 
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
+
+    y, probs = load_probs(run_dir / "test_probs.csv")
+    out_dir = run_dir
 
     cm = confusion_matrix(y, probs.argmax(1), labels=range(len(CLASSES)), normalize="true")
     fig, ax = plt.subplots(figsize=(7.5, 6.5))
@@ -88,15 +94,63 @@ def figures(y, probs, out_dir):
     fig.savefig(out_dir / "reliability.png", dpi=120)
     plt.close(fig)
 
+    log = pd.read_csv(run_dir / "train_log.csv")
+    if len(log) > 1:  # B0 (gradient boosting) has no epochs
+        best = log.val_macro_f1.idxmax()
+        fig, (a1, a2) = plt.subplots(1, 2, figsize=(10, 3.8))
+        a1.plot(log.epoch, log.train_loss, color="#3b6fb6", lw=2, label="train (training objective)")
+        if "val_loss" in log:
+            a1.plot(log.epoch, log.val_loss, color="#d9822b", lw=2, label="val (cross-entropy)")
+        a1.set(xlabel="epoch", ylabel="loss", title="Loss")
+        a2.plot(log.epoch, log.val_macro_f1, color="#3b6fb6", lw=2, label="val macro-F1")
+        if "val_acc" in log:
+            a2.plot(log.epoch, log.val_acc, color="#999999", lw=2, label="val accuracy")
+        a2.axvline(log.epoch[best], color="#333333", lw=1, ls="--", label=f"best epoch ({log.epoch[best]})")
+        a2.set(xlabel="epoch", ylim=(0, 1), title="Validation")
+        for a in (a1, a2):
+            a.xaxis.set_major_locator(matplotlib.ticker.MaxNLocator(integer=True))
+            a.spines[["top", "right"]].set_visible(False)
+            a.legend(frameon=False)
+        fig.tight_layout()
+        fig.savefig(out_dir / "curves.png", dpi=120)
+        plt.close(fig)
 
-def evaluate_run(run_dir, with_figures=False):
+    if images_path and Path(images_path).exists():
+        images = np.load(images_path, mmap_mode="r")
+        ids, pred, conf = pd.read_csv(run_dir / "test_probs.csv").image_id.to_numpy(), probs.argmax(1), probs.max(1)
+        k = 3
+        fig, axes = plt.subplots(len(CLASSES), 2 * k, figsize=(2 * k * 1.3, len(CLASSES) * 1.45))
+        for c, row in enumerate(axes):
+            good = np.flatnonzero((y == c) & (pred == c))
+            bad = np.flatnonzero((y == c) & (pred != c))
+            picks = list(good[np.argsort(-conf[good])][:k]) + [None] * (k - min(k, len(good)))
+            picks += list(bad[np.argsort(-conf[bad])][:k]) + [None] * (k - min(k, len(bad)))
+            for j, (ax, i) in enumerate(zip(row, picks)):
+                ax.set_xticks([]), ax.set_yticks([])
+                if i is None:
+                    ax.set_frame_on(False)
+                    continue
+                ax.imshow(images[ids[i]])
+                ax.set_title(f"{'✓' if j < k else f'→ {pred[i]}'} {conf[i]:.2f}", fontsize=7)
+                for sp in ax.spines.values():
+                    sp.set_color("#3b6fb6" if j < k else "#c0392b")
+                    sp.set_linewidth(2)
+            row[0].set_ylabel(f"{c} {CLASSES[c]}", fontsize=7, rotation=0, ha="right", va="center")
+        fig.suptitle("Test images per class: most confident correct (blue) | most confident wrong (red, → predicted)",
+                     fontsize=9)
+        fig.tight_layout()
+        fig.savefig(out_dir / "examples.png", dpi=110)
+        plt.close(fig)
+
+
+def evaluate_run(run_dir, with_figures=False, images_path=None):
     y, probs = load_probs(run_dir / "test_probs.csv")
     m = metrics(y, probs)
     log = pd.read_csv(run_dir / "train_log.csv")
     m["val_macro_f1"] = log.val_macro_f1.max()
     pd.DataFrame([m]).to_csv(run_dir / "metrics.csv", index=False, float_format="%.4f")
     if with_figures:
-        figures(y, probs, run_dir)
+        figures(run_dir, images_path)
     return m
 
 
@@ -105,10 +159,11 @@ def main():
     p.add_argument("config")
     p.add_argument("--figures", action="store_true")
     p.add_argument("--results", default="results")
+    p.add_argument("--images", default="data/Galaxy10_DECals.npy", help="for examples.png")
     a = p.parse_args()
     name = yaml.safe_load(open(a.config))["name"]
     for run_dir in sorted((Path(a.results) / name).glob("seed*")):
-        m = evaluate_run(run_dir, a.figures)
+        m = evaluate_run(run_dir, a.figures, a.images)
         print(f"{run_dir}: macro_f1={m['macro_f1']:.4f} acc={m['acc']:.4f} ece={m['ece']:.4f}")
 
 

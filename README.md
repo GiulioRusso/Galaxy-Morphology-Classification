@@ -77,7 +77,7 @@ make train CONFIG=configs/b3_zoobot.yaml    # 3 seeds -> results/b3_zoobot/
 make table                                  # regenerate the tables in this README
 ```
 
-Other targets: `make debug CONFIG=...` (1 epoch, 128 images), `make eval CONFIG=...` (figures), `make test`, `make lint`.
+Other targets: `make debug CONFIG=...` (1 epoch, 128 images), `make eval CONFIG=...` (per seed: confusion matrix, reliability diagram, loss and validation curves, and the most confident correct and wrong test images per class), `make test`, `make lint`.
 
 | Config | Baseline |
 |---|---|

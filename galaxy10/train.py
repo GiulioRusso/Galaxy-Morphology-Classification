@@ -96,11 +96,15 @@ def run(cfg, seed, run_dir, ckpt_dir):
             scaler.update()
             model_loss.append(loss.item())
         sched.step()
-        val_f1 = f1_score(ds["val"].labels, predict(model, val_dl, device).argmax(1), average="macro")
-        log.append(dict(epoch=epoch, train_loss=np.mean(model_loss), val_macro_f1=val_f1,
-                        lr=sched.get_last_lr()[0], seconds=time.time() - t0))
-        print(f"[seed {seed}] epoch {epoch}: loss={log[-1]['train_loss']:.4f} val_macro_f1={val_f1:.4f} "
-              f"({log[-1]['seconds']:.0f}s)", flush=True)
+        val_y, val_p = ds["val"].labels, predict(model, val_dl, device)
+        val_f1 = f1_score(val_y, val_p.argmax(1), average="macro")
+        # val_loss is plain cross-entropy for every config, so curves are comparable across loss choices
+        val_loss = -np.log(np.clip(val_p[np.arange(len(val_y)), val_y], 1e-12, None)).mean()
+        log.append(dict(epoch=epoch, train_loss=np.mean(model_loss), val_loss=val_loss, val_macro_f1=val_f1,
+                        val_acc=(val_p.argmax(1) == val_y).mean(), lr=sched.get_last_lr()[0],
+                        seconds=time.time() - t0))
+        print(f"[seed {seed}] epoch {epoch}: train_loss={log[-1]['train_loss']:.4f} val_loss={val_loss:.4f} "
+              f"val_macro_f1={val_f1:.4f} ({log[-1]['seconds']:.0f}s)", flush=True)
         if val_f1 > best:
             best, stale = val_f1, 0
             torch.save(model.state_dict(), ckpt_dir / "best.pt")
