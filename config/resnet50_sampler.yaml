@@ -1,13 +1,13 @@
-# Class-imbalance study on B1: the winner (val macro-F1) sets loss/sampler for B2 and B3.
-#   train + test: uv run scripts/main.py config/b1_resnet50_sampler.yaml
-#   override:     uv run scripts/main.py config/b1_resnet50_sampler.yaml train.epochs=1 data.limit=128
+# Class-imbalance study on ResNet-50: the winner (val macro-F1) sets loss/sampler for ConvNeXt-Tiny and Zoobot.
+#   train + test: uv run scripts/main.py config/resnet50_sampler.yaml
+#   override:     uv run scripts/main.py config/resnet50_sampler.yaml train.epochs=1 data.limit=128
 #   reproduce:    uv run scripts/main.py experiments/<run>/parameters.yaml
 #   test again:   uv run scripts/inference.py experiments/<run>/parameters.yaml
 # Write floats as 1.0e-3, not 1e-3 (YAML 1.1 reads the latter as a string).
 
 framework: dl
 name: null                # experiment folder suffix; null = this file name
-title: "B1 ResNet-50 (ImageNet), balanced sampler"
+title: "ResNet-50 (ImageNet), balanced sampler"
 output_dir: experiments
 seed: 0                   # initialisation and data order
 deterministic: false

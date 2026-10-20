@@ -34,7 +34,7 @@ def load(experiments=ROOT / "experiments"):
 
 def render(df):
     if df is None:
-        empty = "_No results yet: train with `scripts/main.py`, then run `scripts/make_results_table.py`._"
+        empty = "_No results yet: run `launch/train.sh`._"
         return empty, empty, empty
     best = df.loc[df.val_macro_f1.idxmax()]
     headline = (f"**Best model (by validation macro-F1): {best.title}. "

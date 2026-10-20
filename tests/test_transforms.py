@@ -17,7 +17,7 @@ def test_d4_is_a_group_element():
 
 
 def test_config_transforms_shapes():
-    cfg = load_config([str(ROOT / "config/b1_resnet50_wce.yaml")])
+    cfg = load_config([str(ROOT / "config/resnet50_wce.yaml")])
     img = np.random.default_rng(0).integers(0, 256, (256, 256, 3), dtype=np.uint8)
     for stage in ("train", "eval"):
         out, label = build_transforms(cfg["transforms"][stage])(img, 7)

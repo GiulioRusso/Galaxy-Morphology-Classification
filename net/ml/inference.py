@@ -1,4 +1,4 @@
-"""B0 inference + evaluation: inference(cfg) -> <experiment>/inference_<timestamp>/ (same files as torch runs)."""
+"""Gradient-boosting inference: inference(cfg) -> <experiment>/inference_<timestamp>/ (same files as torch runs)."""
 
 from __future__ import annotations
 

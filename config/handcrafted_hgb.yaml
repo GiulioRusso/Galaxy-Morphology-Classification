@@ -1,11 +1,11 @@
-# B0: 115 handcrafted features (net/ml/features.py) + histogram gradient boosting.
-#   train + test: uv run scripts/main.py config/b0_handcrafted.yaml
+# 115 handcrafted features (net/ml/features.py) + histogram gradient boosting.
+#   train + test: uv run scripts/main.py config/handcrafted_hgb.yaml
 #   reproduce:    uv run scripts/main.py experiments/<run>/parameters.yaml
 #   test again:   uv run scripts/inference.py experiments/<run>/parameters.yaml
 
 framework: ml
 name: null                          # experiment folder suffix; null = this file name
-title: "B0 Handcrafted features + gradient boosting"
+title: "Handcrafted features + gradient boosting"
 output_dir: experiments
 seed: 0                             # model and data-order seed
 deterministic: false

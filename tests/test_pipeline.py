@@ -22,11 +22,11 @@ def data_overrides(fake, out, limit):
 
 
 def test_dl_train_test_and_inference(fake, tmp_path):
-    script("main")([str(ROOT / "config/b1_resnet50_wce.yaml"), *data_overrides(fake, tmp_path, 16), "device=cpu",
+    script("main")([str(ROOT / "config/resnet50_wce.yaml"), *data_overrides(fake, tmp_path, 16), "device=cpu",
                     "model.name=test_resnet", "model.pretrained=false", "train.epochs=2", "data.batch_size=8",
                     "data.num_workers=0"])
     run = only_run(tmp_path)
-    assert run.name.endswith("_b1_resnet50_wce")  # suffix = config file name
+    assert run.name.endswith("_resnet50_wce")  # suffix = config file name
     files = {str(p.relative_to(run)) for p in run.rglob("*")}
     assert {"parameters.yaml", "logs/train.log", "logs/log_epoch.csv", "logs/log_steps.csv",
             "checkpoints.nosync/best.pt", "checkpoints.nosync/last.pt", "plots/loss.png", "plots/macro_f1.png",
@@ -47,7 +47,7 @@ def test_dl_train_test_and_inference(fake, tmp_path):
 
 
 def test_ml_train_and_test(fake, tmp_path):
-    script("main")([str(ROOT / "config/b0_handcrafted.yaml"), *data_overrides(fake, tmp_path, 12),
+    script("main")([str(ROOT / "config/handcrafted_hgb.yaml"), *data_overrides(fake, tmp_path, 12),
                     "data.workers=2", "model.max_iter=5", "model.early_stopping=false"])
     run = only_run(tmp_path)
     assert {"parameters.yaml", "logs/train.log", "logs/log_epoch.csv", "checkpoints.nosync/model.joblib",

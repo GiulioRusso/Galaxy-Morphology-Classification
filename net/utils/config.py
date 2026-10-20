@@ -51,6 +51,6 @@ def load_config(argv: list[str] | None = None) -> dict:
         if not sep or not isinstance(node, dict) or leaf not in node:
             sys.exit(f"[config] unknown key {key!r}: add it to the YAML first")
         node[leaf] = parse_value(text)
-    if "name" in cfg and not cfg["name"]:  # experiment folder suffix: the config file name, e.g. b1_resnet50_focal
+    if "name" in cfg and not cfg["name"]:  # experiment folder suffix: the config file name, e.g. resnet50_focal
         cfg["name"] = Path(argv[0]).stem
     return cfg

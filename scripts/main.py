@@ -1,7 +1,6 @@
 """Train (+ test with inference.after_train).
 
-    uv run scripts/main.py config/b1_resnet50_focal.yaml [key.sub=value ...]
-    uv run scripts/main.py config/b1_resnet50_focal.yaml seed=1          # seed also selects the split
+    uv run scripts/main.py config/resnet50_focal.yaml [key.sub=value ...]
     uv run scripts/main.py experiments/<run>/parameters.yaml             # reproduce a run
 """
 

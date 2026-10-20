@@ -1,13 +1,14 @@
-# Class-imbalance study on B1: the winner (val macro-F1) sets loss/sampler for B2 and B3.
-#   train + test: uv run scripts/main.py config/b1_resnet50_focal.yaml
-#   override:     uv run scripts/main.py config/b1_resnet50_focal.yaml train.epochs=1 data.limit=128
+# Same architecture and ImageNet init as Zoobot; only the Galaxy Zoo pretraining differs.
+# loss/sampler: set to the winner of the ResNet-50 imbalance study.
+#   train + test: uv run scripts/main.py config/convnext_tiny.yaml
+#   override:     uv run scripts/main.py config/convnext_tiny.yaml train.epochs=1 data.limit=128
 #   reproduce:    uv run scripts/main.py experiments/<run>/parameters.yaml
 #   test again:   uv run scripts/inference.py experiments/<run>/parameters.yaml
 # Write floats as 1.0e-3, not 1e-3 (YAML 1.1 reads the latter as a string).
 
 framework: dl
 name: null                # experiment folder suffix; null = this file name
-title: "B1 ResNet-50 (ImageNet), focal loss"
+title: "ConvNeXt-Tiny (ImageNet-12k→1k)"
 output_dir: experiments
 seed: 0                   # initialisation and data order
 deterministic: false
@@ -35,13 +36,13 @@ transforms:               # functions in net/data/transforms/transforms.py, appl
     - {name: normalize}
 
 model:                    # keyword arguments of net.model.model.Net (any timm model name)
-  name: resnet50.tv_in1k
+  name: convnext_tiny.in12k_ft_in1k
   num_classes: 10
   pretrained: true
   grad_checkpointing: true
 
-loss: {name: FocalLoss, gamma: 2.0}
-optimizer: {name: AdamW, lr: 3.0e-4, weight_decay: 0.05}
+loss: {name: CrossEntropyLoss, weight: balanced}   # inverse class frequency
+optimizer: {name: AdamW, lr: 1.0e-4, weight_decay: 0.05}
 scheduler: {name: CosineAnnealingLR, T_max: 30}
 
 train:

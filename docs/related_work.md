@@ -20,6 +20,6 @@ Walmsley et al. (2024, App. D.4) state the problem directly: published Galaxy10 
 - **Model selection on validation only.** The test set is read once per run.
 - **Macro-F1 as the only metric.** The classes range from 334 to 2,645 images, and accuracy hides failures on the small ones.
 
-## Caveat for B3 (Zoobot)
+## Caveat for Zoobot
 
-Zoobot encoders are pretrained on GZ Evo, which includes Galaxy Zoo DECaLS volunteer votes ([Zoobot docs](https://zoobot.readthedocs.io/en/latest/pretrained_models.html)). Galaxy10 DECaLS labels are derived from those same GZ DECaLS votes. Our test galaxies were therefore very likely seen during pretraining, together with the vote fractions that define their labels. The Zoobot documentation does not mention excluding Galaxy10 galaxies. B3 is reported as **domain-pretrained, with possible label exposure**. It is not evidence of generalisation to unseen galaxies. B1 and B2 (ImageNet only) carry no such exposure.
+Zoobot encoders are pretrained on GZ Evo, which includes Galaxy Zoo DECaLS volunteer votes ([Zoobot docs](https://zoobot.readthedocs.io/en/latest/pretrained_models.html)). Galaxy10 DECaLS labels are derived from those same GZ DECaLS votes. Our test galaxies were therefore very likely seen during pretraining, together with the vote fractions that define their labels. The Zoobot documentation does not mention excluding Galaxy10 galaxies. Zoobot is reported as **domain-pretrained, with possible label exposure**. It is not evidence of generalisation to unseen galaxies. ResNet-50 and ConvNeXt-Tiny (ImageNet only) carry no such exposure.

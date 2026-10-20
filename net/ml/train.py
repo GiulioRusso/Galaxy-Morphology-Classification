@@ -1,4 +1,4 @@
-"""B0: handcrafted features + gradient boosting: train(cfg).
+"""Handcrafted features + gradient boosting: train(cfg).
 
 Writes experiments/<timestamp>_<name>/: parameters.yaml, logs/{train.log, log_epoch.csv} (one row per boosting
 iteration: train/val loss and val F1 from staged predictions), plots/, checkpoints.nosync/model.joblib,

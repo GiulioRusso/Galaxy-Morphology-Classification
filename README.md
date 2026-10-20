@@ -3,7 +3,7 @@
 A leakage-free, reproducible 10-class benchmark on Galaxy10 DECaLS. It compares handcrafted features, ImageNet-pretrained CNNs and a Galaxy Zoo-pretrained encoder. Every number below is generated from the committed experiment logs.
 
 <!-- HEADLINE:START -->
-_No results yet: train with `scripts/main.py`, then run `scripts/make_results_table.py`._
+_No results yet: run `launch/train.sh`._
 <!-- HEADLINE:END -->
 
 <img src="./images/galaxy10_example.png">
@@ -46,27 +46,27 @@ v2 splits before any augmentation, keeps all 10 classes, removes conflicting dup
 - **Augmentation:** applied on the fly to training images only. It uses the D4 dihedral group (90° rotations × flips; galaxies have no preferred orientation), a random 224 crop from the 256 image, and mild brightness and contrast jitter.
 - **Metric:** macro-F1 over the 10 classes, plus per-class F1. Accuracy is not reported: with imbalanced classes it is dominated by the large ones.
 - **Model selection:** early stopping, the best checkpoint and the model choice use validation macro-F1. Loss is logged for train and validation. The test set is read once per run.
-- **Class imbalance:** weighted cross-entropy, focal loss and a class-balanced sampler are compared on B1, and the winner is picked by validation macro-F1.
+- **Class imbalance:** weighted cross-entropy, focal loss and a class-balanced sampler are compared on ResNet-50, and the winner is picked by validation macro-F1.
 
 ## Results
 
 One run per model (seed 0), 10 classes, test set. Validation macro-F1 is the best epoch's, which selected the checkpoint.
 
 <!-- RESULTS:START -->
-_No results yet: train with `scripts/main.py`, then run `scripts/make_results_table.py`._
+_No results yet: run `launch/train.sh`._
 <!-- RESULTS:END -->
 
 Per-class test F1:
 
 <!-- PERCLASS:START -->
-_No results yet: train with `scripts/main.py`, then run `scripts/make_results_table.py`._
+_No results yet: run `launch/train.sh`._
 <!-- PERCLASS:END -->
 
 Error analysis (most-confused class pairs with examples): [`notebooks/error_analysis.ipynb`](notebooks/error_analysis.ipynb).
 
 ## Comparison with published work
 
-Published Galaxy10 DECaLS results report top-1 accuracy (about 73% to 95%), while we report macro-F1. None of them uses a duplicate-aware split, and the splits are not shared. The numbers are therefore **not comparable**. The table, protocols and caveats are in [`docs/related_work.md`](docs/related_work.md). In particular, the Zoobot encoder (B3) was pretrained on Galaxy Zoo votes that very likely include our test galaxies.
+Published Galaxy10 DECaLS results report top-1 accuracy (about 73% to 95%), while we report macro-F1. None of them uses a duplicate-aware split, and the splits are not shared. The numbers are therefore **not comparable**. The table, protocols and caveats are in [`docs/related_work.md`](docs/related_work.md). In particular, the Zoobot encoder was pretrained on Galaxy Zoo votes that very likely include our test galaxies.
 
 ## Reproduce
 
@@ -74,11 +74,14 @@ Requires [uv](https://docs.astral.sh/uv/). Configs are sized for a 16 GB Apple-s
 
 ```bash
 uv sync
-uv run scripts/download_data.py                        # h5 (2.7 GB, MD5-checked, resumable)
-uv run scripts/preprocess.py config/preprocess.yaml    # .npy + split (the split is already committed in splits/)
-uv run scripts/main.py config/b3_zoobot.yaml           # train, then test the best checkpoint
-uv run scripts/make_results_table.py                   # regenerate the tables in this README
+launch/prepare.sh                                                     # download (2.7 GB) + .npy; the split is committed in splits/
+launch/train.sh config/handcrafted_hgb.yaml config/resnet50_*.yaml    # baseline + imbalance study
+# set loss/sampler in convnext_tiny.yaml and zoobot.yaml to the resnet50 winner (best Val macro-F1 below)
+launch/train.sh config/convnext_tiny.yaml config/zoobot.yaml
 ```
+
+`launch/train.sh` trains and tests each config in turn, kills a run if macOS memory gets low, and regenerates the tables in this README. `launch/` holds every entry point: `prepare.sh`, `train.sh`, `inference.sh` (re-test a run), `test.sh` (lint + unit tests, `--debug` adds a 1-epoch run on 128 real images).
+
 
 Training and test of a run write into one folder (layout of [AI-template](https://github.com/GiulioRusso/AI-template)). The folder suffix is the config file name, unless `name:` is set in the config:
 
@@ -90,7 +93,7 @@ experiments/<timestamp>_<config name>/
     log_epoch.csv          one row per epoch: train loss, val loss, val macro-F1, val F1 per class, lr, seconds
     log_steps.csv          one row per training step: loss, lr
   plots/                   loss, loss_steps, macro_f1, per_class_f1, lr, val_confusion_matrix (rewritten every epoch)
-  checkpoints.nosync/      best.pt (best val macro-F1), last.pt (B0: model.joblib); not committed, out of iCloud
+  checkpoints.nosync/      best.pt (best val macro-F1), last.pt (gradient boosting: model.joblib); not committed, out of iCloud
   inference_<timestamp>/
     parameters.yaml
     logs/test.log, logs/log_test.csv   test macro-F1 and F1 per class
@@ -98,18 +101,18 @@ experiments/<timestamp>_<config name>/
     plots/                             confusion_matrix, examples (most confident correct and wrong per class)
 ```
 
-Any config key can be overridden as `key.sub=value`, e.g. `data.limit=128 train.epochs=1` for a quick debug run. Re-test a run with `uv run scripts/inference.py experiments/<run>/parameters.yaml`, resume one with `train.resume=experiments/<run>/checkpoints.nosync/last.pt train.resume_optimizer=true`. Checks: `uv run pytest`, `uv run ruff check`.
+Any config key can be overridden as `key.sub=value`, e.g. `data.limit=128 train.epochs=1` for a quick debug run. Resume a run with `train.resume=experiments/<run>/checkpoints.nosync/last.pt train.resume_optimizer=true`.
 
 | Config (`config/`) | Baseline |
 |---|---|
-| `b0_handcrafted.yaml` | Handcrafted geometric/texture/colour features + gradient boosting |
-| `b1_resnet50_{wce,focal,sampler}.yaml` | ResNet-50 (ImageNet), one config per imbalance strategy |
-| `b2_convnext_tiny.yaml` | ConvNeXt-Tiny (ImageNet-12k→1k) |
-| `b3_zoobot.yaml` | Zoobot ConvNeXt-Tiny (Galaxy Zoo); same architecture as B2, different pretraining |
+| `handcrafted_hgb.yaml` | Handcrafted geometric/texture/colour features + gradient boosting |
+| `resnet50_{wce,focal,sampler}.yaml` | ResNet-50 (ImageNet), one config per imbalance strategy |
+| `convnext_tiny.yaml` | ConvNeXt-Tiny (ImageNet-12k→1k) |
+| `zoobot.yaml` | Zoobot ConvNeXt-Tiny (Galaxy Zoo); same architecture as ConvNeXt-Tiny, different pretraining |
 
 ## Limitations
 
 - Labels are volunteer-vote thresholds, so neighbouring classes (e.g. Disturbed vs Merging, tight vs loose spiral) overlap.
 - One run per model (seed 0): differences of a few F1 points can be run-to-run noise. Cigar Shaped Smooth has only 333 images (≈50 in test), so its F1 is the noisiest.
 - The data comes from a single survey (DECaLS imaging), and transfer to other surveys is not tested.
-- B3's pretraining likely includes the test galaxies' Galaxy Zoo votes (see above).
+- Zoobot's pretraining likely includes the test galaxies' Galaxy Zoo votes (see above).

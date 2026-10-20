@@ -1,4 +1,4 @@
-"""B0 handcrafted features (gradient boosting in net/ml/train.py).
+"""Handcrafted features (gradient boosting in net/ml/train.py).
 
 Port of v1 AIA/handcrafted_features_extraction.py (pipeline: NLM denoise -> Otsu -> opening -> central
 object -> geometric / intensity / GLCM / LBP / Gabor / Fourier features), with v1 bugs fixed:
