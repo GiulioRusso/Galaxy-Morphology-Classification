@@ -1,8 +1,0 @@
-# Class-imbalance study on B1 (pick the winner by mean val macro-F1, then use its loss/sampler for B2 and B3).
-name: b1_resnet50_sampler
-title: "B1 ResNet-50 (ImageNet), loss=ce, balanced sampler=true"
-model: resnet50.tv_in1k
-loss: ce
-sampler: true
-batch_size: 32
-lr: 3.0e-4

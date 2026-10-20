@@ -15,7 +15,7 @@ Walmsley et al. (2024, App. D.4) state the problem directly: published Galaxy10 
 
 ## How our protocol differs
 
-- **Duplicates removed, overlaps grouped.** The release contains 59 pixel-identical image pairs whose two copies have different labels; we drop both copies. Cutouts within 60″ on the sky overlap and are grouped, and each group goes entirely into train, val or test (`galaxy10/data.py`). We use stratified 70/15/15 splits with 3 seeds, and the split files are committed.
+- **Duplicates removed, overlaps grouped.** The release contains 59 pixel-identical image pairs whose two copies have different labels; we drop both copies. Cutouts within 60″ on the sky overlap and are grouped, and each group goes entirely into train, val or test (`net/data/preprocessing.py`). We use stratified 70/15/15 splits with 3 seeds, and the split files are committed.
 - **No offline augmentation.** D4 rotations and flips are applied on the fly, to training images only.
 - **Model selection on validation only.** The test set is read once per run.
 - **Macro-F1 as the primary metric.** The classes range from 334 to 2,645 images, and accuracy hides failures on the small ones.

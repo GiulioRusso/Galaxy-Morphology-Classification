@@ -1,7 +1,8 @@
 import numpy as np
 import torch
 
-from galaxy10.transforms import D4, build
+from net.data.transforms.transforms import build_transforms, d4
+from net.utils.config import ROOT, load_config
 
 
 def test_d4_is_a_group_element():
@@ -10,13 +11,14 @@ def test_d4_is_a_group_element():
     group += [g.flip(-1) for g in group]
     torch.manual_seed(0)
     for _ in range(50):
-        y = D4()(x)
-        assert y.shape == x.shape
+        y, label = d4(x, 3)
+        assert y.shape == x.shape and label == 3
         assert any(torch.equal(y, g) for g in group)
 
 
-def test_build_shapes():
+def test_config_transforms_shapes():
+    cfg = load_config([str(ROOT / "config/b1_resnet50_wce.yaml")])
     img = np.random.default_rng(0).integers(0, 256, (256, 256, 3), dtype=np.uint8)
-    for train in (True, False):
-        out = build(train)(img)
-        assert out.shape == (3, 224, 224) and out.dtype == torch.float32
+    for stage in ("train", "eval"):
+        out, label = build_transforms(cfg["transforms"][stage])(img, 7)
+        assert out.shape == (3, 224, 224) and out.dtype == torch.float32 and label == 7

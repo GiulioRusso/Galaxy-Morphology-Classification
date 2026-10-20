@@ -2,7 +2,7 @@ import h5py
 import numpy as np
 import pytest
 
-from galaxy10.data import prepare
+from net.data.preprocessing import prepare
 
 N, BLACK, DUP = 200, [5, 77], (10, 30)  # DUP: same sky position, must land in the same split
 TWIN = (40, 41)  # pixel-identical with conflicting labels: both dropped

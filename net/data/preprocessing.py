@@ -1,6 +1,7 @@
-"""Galaxy10 DECaLS: image cleaning, overlap grouping, leakage-free splits, torch Dataset.
+"""Galaxy10 DECaLS: image cleaning, overlap grouping, leakage-free splits.
 
-    python -m galaxy10.data   # data/images.npy + splits/galaxy10_seed{0,1,2}.csv + splits/dropped.csv
+    uv run scripts/preprocess.py config/preprocess.yaml
+    # -> data/Galaxy10_DECals.npy + splits/galaxy10_seed{0,1,2}.csv + splits/dropped.csv
 
 image_id is the row index in Galaxy10_DECals.h5 and never changes (no renaming).
 The h5 is gzip-chunked across 555 images per chunk, so reading one image decompresses ~100 MB;
@@ -13,7 +14,6 @@ Cleaning (logged to splits/dropped.csv):
 Grouping: cutouts within GROUP_RADIUS_ARCSEC overlap on the sky (a cutout spans 67" or 134") and share pixels
 (median correlation 0.94-0.99 measured on the overlap), so they form one group that never spans two splits.
 """
-import argparse
 import hashlib
 from pathlib import Path
 
@@ -24,14 +24,9 @@ from scipy.sparse import coo_matrix
 from scipy.sparse.csgraph import connected_components
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import BallTree
-from torch.utils.data import Dataset
 
-CLASSES = [
-    "Disturbed", "Merging", "Round Smooth", "In-between Round Smooth", "Cigar Shaped Smooth",
-    "Barred Spiral", "Unbarred Tight Spiral", "Unbarred Loose Spiral", "Edge-on no Bulge", "Edge-on with Bulge",
-]
-SUPERCLASSES = ["Disturbed/Merging", "Smooth", "Spiral", "Edge-on"]
-SUPERCLASS = [0, 0, 1, 1, 1, 2, 2, 2, 3, 3]  # class -> superclass (v1 4-class mapping)
+from net.utils.logger import logger
+
 GROUP_RADIUS_ARCSEC = 60.0
 SPLIT_FRACTIONS = (0.70, 0.15, 0.15)
 
@@ -83,12 +78,12 @@ def make_split(labels, groups, seed):
     return split_of[groups].to_numpy()
 
 
-def prepare(h5_path, splits_dir, seeds):
+def prepare(h5_path, splits_dir, seeds, radius_arcsec=GROUP_RADIUS_ARCSEC):
     npy = Path(h5_path).with_suffix(".npy")
     with h5py.File(h5_path, "r") as f:
         labels, ra, dec = f["ans"][:].astype(int), f["ra"][:], f["dec"][:]
         if not npy.exists():
-            print(f"converting {h5_path} -> {npy}")
+            logger.info(f"converting {h5_path} -> {npy}")
             to_npy(f["images"], npy)
     images = np.load(npy, mmap_mode="r")
     dropped = pd.DataFrame([(i, "blank") for i in find_blank(images)] + find_identical(images, labels),
@@ -96,48 +91,15 @@ def prepare(h5_path, splits_dir, seeds):
     dropped.insert(1, "label", labels[dropped.image_id])
     Path(splits_dir).mkdir(exist_ok=True)
     dropped.to_csv(Path(splits_dir) / "dropped.csv", index=False)
-    print("dropped:", dropped.reason.value_counts().to_dict())
+    logger.info(f"dropped: {dropped.reason.value_counts().to_dict()}")
     keep = np.setdiff1d(np.arange(len(labels)), dropped.image_id)
 
-    groups = overlap_groups(ra[keep], dec[keep])
+    groups = overlap_groups(ra[keep], dec[keep], radius_arcsec)
     sizes = np.bincount(groups)
-    print(f"{len(keep)} images, {len(sizes)} groups, {(sizes > 1).sum()} multi-image groups "
-          f"covering {sizes[sizes > 1].sum()} images (radius {GROUP_RADIUS_ARCSEC}\")")
+    logger.info(f"{len(keep)} images, {len(sizes)} groups, {(sizes > 1).sum()} multi-image groups "
+                f"covering {sizes[sizes > 1].sum()} images (radius {radius_arcsec}\")")
     for seed in seeds:
         df = pd.DataFrame(dict(image_id=keep, label=labels[keep], group=groups,
                                split=make_split(labels[keep], groups, seed)))
         df.to_csv(Path(splits_dir) / f"galaxy10_seed{seed}.csv", index=False)
-        print(f"seed {seed}:", df.split.value_counts().to_dict())
-
-
-class Galaxy10(Dataset):
-    """(image, label) for one split, read from the memory-mapped images .npy (see prepare)."""
-
-    def __init__(self, split_csv, split, images_path, transform, limit=None):
-        df = pd.read_csv(split_csv)
-        df = df[df.split == split]
-        if limit:
-            df = df.sample(n=min(limit, len(df)), random_state=0)
-        self.ids, self.labels = df.image_id.to_numpy(), df.label.to_numpy()
-        self.images_path, self.transform, self.images = images_path, transform, None
-
-    def __len__(self):
-        return len(self.ids)
-
-    def __getitem__(self, i):
-        if self.images is None:
-            self.images = np.load(self.images_path, mmap_mode="r")  # opened lazily, per DataLoader worker
-        return self.transform(np.array(self.images[self.ids[i]])), int(self.labels[i])
-
-
-def main():
-    p = argparse.ArgumentParser()
-    p.add_argument("--h5", default="data/Galaxy10_DECals.h5")
-    p.add_argument("--splits", default="splits")
-    p.add_argument("--seeds", type=int, nargs="+", default=[0, 1, 2])
-    a = p.parse_args()
-    prepare(a.h5, a.splits, a.seeds)
-
-
-if __name__ == "__main__":
-    main()
+        logger.info(f"seed {seed}: {df.split.value_counts().to_dict()}")

@@ -1,7 +1,8 @@
 import numpy as np
 from sklearn.metrics import accuracy_score, balanced_accuracy_score, f1_score
 
-from galaxy10.evaluate import ece, metrics
+from net.metrics.metrics import compute_metrics as metrics
+from net.metrics.metrics import ece
 
 
 def test_metrics_match_sklearn():

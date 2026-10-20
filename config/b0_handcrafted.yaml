@@ -1,0 +1,29 @@
+# B0: 115 handcrafted features (net/ml/features.py) + histogram gradient boosting.
+#   train + test: uv run scripts/main.py config/b0_handcrafted.yaml seed=0      (seed 0|1|2 also selects the split)
+#   reproduce:    uv run scripts/main.py experiments/<run>/parameters.yaml
+#   test again:   uv run scripts/inference.py experiments/<run>/parameters.yaml
+
+framework: ml
+name: b0_handcrafted
+title: "B0 Handcrafted features + gradient boosting"
+output_dir: experiments
+seed: 0
+deterministic: false
+
+data:
+  images: data/Galaxy10_DECals.npy
+  splits: splits/galaxy10_seed{seed}.csv
+  limit: null                         # images per split, for quick debugging
+  features_cache: data/features.npz   # input cache shared by all seeds (computed once)
+  workers: null                       # feature-extraction processes (null = all cores)
+
+model:                                # keyword arguments of sklearn HistGradientBoostingClassifier
+  learning_rate: 0.05
+  max_iter: 1000
+  class_weight: balanced
+  early_stopping: true                # internal split of the training set
+
+inference:
+  checkpoint: null                    # set to this run's model.joblib when training ends
+  split: test
+  after_train: true

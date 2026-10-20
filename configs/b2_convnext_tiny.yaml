@@ -1,9 +1,0 @@
-# Same architecture and ImageNet init as B3; only the Galaxy Zoo pretraining differs.
-# loss/sampler: set to the winner of the B1 imbalance study.
-name: b2_convnext_tiny
-title: "B2 ConvNeXt-Tiny (ImageNet-12k→1k)"
-model: convnext_tiny.in12k_ft_in1k
-loss: weighted_ce
-sampler: false
-batch_size: 32
-lr: 1.0e-4

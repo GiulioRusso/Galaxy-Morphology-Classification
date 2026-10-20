@@ -1,9 +1,9 @@
-# Galaxy Morphology Classification (v2)
+# Galaxy Morphology Classification
 
 A leakage-free, reproducible 10-class benchmark on Galaxy10 DECaLS. It compares handcrafted features, ImageNet-pretrained CNNs and a Galaxy Zoo-pretrained encoder. Every number below is generated from committed outputs.
 
 <!-- HEADLINE:START -->
-_No results yet: run `make train CONFIG=...` then `make table`._
+_No results yet: train with `scripts/main.py`, then run `scripts/make_results_table.py`._
 <!-- HEADLINE:END -->
 
 <img src="./images/galaxy10_example.png">
@@ -52,13 +52,13 @@ v2 splits before any augmentation, keeps all 10 classes, removes conflicting dup
 Mean ± std over 3 seeds, 10 classes, test set. The 4-superclass score is computed from the 10-class predictions (no separate training).
 
 <!-- RESULTS:START -->
-_No results yet: run `make train CONFIG=...` then `make table`._
+_No results yet: train with `scripts/main.py`, then run `scripts/make_results_table.py`._
 <!-- RESULTS:END -->
 
 Per-class F1 of the best model (selected by validation macro-F1):
 
 <!-- PERCLASS:START -->
-_No results yet: run `make train CONFIG=...` then `make table`._
+_No results yet: train with `scripts/main.py`, then run `scripts/make_results_table.py`._
 <!-- PERCLASS:END -->
 
 Error analysis (most-confused class pairs with examples): [`notebooks/error_analysis.ipynb`](notebooks/error_analysis.ipynb).
@@ -72,14 +72,30 @@ Published Galaxy10 DECaLS results report top-1 accuracy between about 73% and 95
 Requires [uv](https://docs.astral.sh/uv/). Configs are sized for a 16 GB Apple-silicon laptop (MPS, fp16 autocast, gradient checkpointing, batch 32); CPU and CUDA also work. On a Mac, keep it plugged in with Low Power Mode off (it throttles the GPU). GPU memory is capped with `mps_memory_fraction` (default 0.4), so a run that needs too much memory fails with an out-of-memory error instead of freezing the machine.
 
 ```bash
-make data                                   # download the h5 (2.7 GB, MD5-checked) and write splits
-make train CONFIG=configs/b3_zoobot.yaml    # 3 seeds -> results/b3_zoobot/
-make table                                  # regenerate the tables in this README
+uv sync
+uv run scripts/download_data.py                              # h5 (2.7 GB, MD5-checked, resumable)
+uv run scripts/preprocess.py config/preprocess.yaml          # .npy + splits (already committed in splits/)
+for s in 0 1 2; do uv run scripts/main.py config/b3_zoobot.yaml seed=$s; done   # train + test
+uv run scripts/make_results_table.py                         # regenerate the tables in this README
 ```
 
-Other targets: `make debug CONFIG=...` (1 epoch, 128 images), `make eval CONFIG=...` (per seed: confusion matrix, reliability diagram, loss and validation curves, and the most confident correct and wrong test images per class), `make test`, `make lint`.
+Every run, training and test, writes into one folder (layout of [AI-template](https://github.com/GiulioRusso/AI-template)):
 
-| Config | Baseline |
+```
+experiments/<timestamp>_<name>_seed<N>/
+  parameters.yaml        full resolved config + git commit: reproduces the run, drives inference
+  run.log
+  history.csv            one row per epoch: train/val loss and every metric, lr, seconds
+  steps.csv              one row per training step: loss, batch accuracy, lr
+  plots/                 loss, macro_f1, acc, ..., per_class_f1, steps, lr, val_confusion_matrix (rewritten each epoch)
+  checkpoints.nosync/    best.pt, last.pt (not committed; .nosync keeps them out of iCloud)
+  inference_<timestamp>/ parameters.yaml, run.log, predictions.csv, metrics.csv,
+                         plots/ confusion_matrix, reliability, examples (most confident correct and wrong per class)
+```
+
+Any config key can be overridden as `key.sub=value`, e.g. `data.limit=128 train.epochs=1` for a quick debug run. Re-test a run with `uv run scripts/inference.py experiments/<run>/parameters.yaml`, resume one with `train.resume=experiments/<run>/checkpoints.nosync/last.pt train.resume_optimizer=true`. Checks: `uv run pytest`, `uv run ruff check`.
+
+| Config (`config/`) | Baseline |
 |---|---|
 | `b0_handcrafted.yaml` | Handcrafted geometric/texture/colour features + gradient boosting |
 | `b1_resnet50_{wce,focal,sampler}.yaml` | ResNet-50 (ImageNet), one config per imbalance strategy |

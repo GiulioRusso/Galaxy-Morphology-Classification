@@ -1,4 +1,4 @@
-"""B0: handcrafted features + gradient boosting.
+"""B0 handcrafted features (gradient boosting in net/ml/train.py).
 
 Port of v1 AIA/handcrafted_features_extraction.py (pipeline: NLM denoise -> Otsu -> opening -> central
 object -> geometric / intensity / GLCM / LBP / Gabor / Fourier features), with v1 bugs fixed:
@@ -9,16 +9,15 @@ object -> geometric / intensity / GLCM / LBP / Gabor / Fourier features), with v
 - colour was discarded; now per-channel statistics inside the galaxy mask are included.
 """
 from multiprocessing import Pool
-from pathlib import Path
 
 import cv2
 import numpy as np
 import pandas as pd
 from skimage.feature import graycomatrix, graycoprops, local_binary_pattern
-from sklearn.ensemble import HistGradientBoostingClassifier
-from sklearn.metrics import f1_score
 
-from galaxy10.evaluate import PROB_COLS, evaluate_run
+from net.data.dataset import split_csv
+from net.utils.config import relative_to_root, resolve
+from net.utils.logger import logger
 
 GLCM_ANGLES = np.arange(4) * np.pi / 4
 GLCM_PROPS = ["contrast", "dissimilarity", "homogeneity", "energy", "correlation", "ASM"]
@@ -101,29 +100,17 @@ def compute(images_path, ids, workers=None):
         return np.stack(pool.map(_extract_id, ids, chunksize=64))
 
 
-def run(cfg, seed, run_dir):
-    df = pd.read_csv(Path(cfg["splits"]) / f"galaxy10_seed{seed}.csv")
-    if cfg.get("limit"):
-        df = df.groupby("split", group_keys=False).apply(lambda s: s.sample(min(cfg["limit"], len(s)), random_state=0))
-    cache = Path(cfg["images"]).parent / "features.npz"
-    if cache.exists() and np.isin(df.image_id, np.load(cache)["ids"]).all():
+def features(cfg: dict, ids) -> np.ndarray:
+    """Feature matrix for image ids. data.features_cache holds every image of the split CSV (input data, like
+    the .npy), so it is computed once (~2 min on 8 processes) and shared by all seeds."""
+    images, cache = resolve(cfg["data"]["images"]), resolve(cfg["data"]["features_cache"])
+    if cache.exists():
         z = np.load(cache)
-        X = pd.DataFrame(z["X"], index=z["ids"]).loc[df.image_id].to_numpy()
-    else:
-        X = compute(cfg["images"], df.image_id.to_numpy())
-        if not cfg.get("limit"):
-            np.savez(cache, ids=df.image_id.to_numpy(), X=X)
-    tr, va, te = (df.split == s for s in ("train", "val", "test"))
-    clf = HistGradientBoostingClassifier(learning_rate=0.05, max_iter=1000, class_weight="balanced",
-                                         early_stopping=True, random_state=seed)  # internal val is taken from train
-    clf.fit(X[tr], df.label[tr])
-    val_f1 = f1_score(df.label[va], clf.predict(X[va]), average="macro")
-    run_dir.mkdir(parents=True, exist_ok=True)
-    pd.DataFrame([dict(epoch=clf.n_iter_, val_macro_f1=val_f1)]).to_csv(run_dir / "train_log.csv", index=False)
-    probs = np.zeros((te.sum(), len(PROB_COLS)))
-    probs[:, clf.classes_] = clf.predict_proba(X[te])  # classes absent from a tiny debug train set stay 0
-    out = pd.DataFrame(probs, columns=PROB_COLS)
-    out.insert(0, "label", df.label[te].to_numpy())
-    out.insert(0, "image_id", df.image_id[te].to_numpy())
-    out.to_csv(run_dir / "test_probs.csv", index=False, float_format="%.5f")
-    return evaluate_run(run_dir)
+        if np.isin(ids, z["ids"]).all():
+            return pd.DataFrame(z["X"], index=z["ids"]).loc[ids].to_numpy()
+    if cfg["data"]["limit"]:  # debug subset: no cache
+        return compute(images, ids, cfg["data"]["workers"])
+    all_ids = pd.read_csv(split_csv(cfg)).image_id.to_numpy()
+    logger.info(f"computing handcrafted features for {len(all_ids)} images -> {relative_to_root(cache)}")
+    np.savez(cache, ids=all_ids, X=compute(images, all_ids, cfg["data"]["workers"]))
+    return features(cfg, ids)

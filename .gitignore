@@ -10,7 +10,7 @@ data/
 *.h5
 *.pt
 *.ckpt
-outputs
-outputs/
+*.joblib
+experiments/*.log
 wandb/
 .ipynb_checkpoints/

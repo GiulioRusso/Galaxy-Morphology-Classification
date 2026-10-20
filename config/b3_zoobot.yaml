@@ -1,0 +1,62 @@
+# Zoobot ConvNeXt-Tiny encoder, pretrained on GZ Evo (Galaxy Zoo volunteer votes).
+# Caveat: GZ Evo includes GZ DECaLS, the source of Galaxy10 DECaLS labels, so test galaxies were likely seen
+# (with their votes) during pretraining. See docs/related_work.md.
+# loss/sampler: set to the winner of the B1 imbalance study.
+#   train + test: uv run scripts/main.py config/b3_zoobot.yaml seed=0      (seed 0|1|2 also selects the split)
+#   override:     uv run scripts/main.py config/b3_zoobot.yaml seed=1 train.epochs=5 data.limit=128
+#   reproduce:    uv run scripts/main.py experiments/<run>/parameters.yaml
+#   test again:   uv run scripts/inference.py experiments/<run>/parameters.yaml
+# Write floats as 1.0e-3, not 1e-3 (YAML 1.1 reads the latter as a string).
+
+framework: dl
+name: b3_zoobot
+title: "B3 Zoobot ConvNeXt-Tiny (Galaxy Zoo)"
+output_dir: experiments
+seed: 0
+deterministic: false
+device: auto              # auto | cpu | cuda | mps
+mps_memory_fraction: 0.4  # Apple silicon: cap GPU memory so overuse raises an error instead of freezing macOS
+
+data:
+  images: data/Galaxy10_DECals.npy
+  splits: splits/galaxy10_seed{seed}.csv
+  limit: null             # images per split, for quick debugging
+  sampler: false          # class-balanced WeightedRandomSampler for training
+  batch_size: 32
+  num_workers: 3
+
+transforms:               # functions in net/data/transforms/transforms.py, applied in order
+  train:
+    - {name: to_tensor}
+    - {name: d4}
+    - {name: random_crop, size: 224}
+    - {name: color_jitter, brightness: 0.1, contrast: 0.1}
+    - {name: normalize}
+  eval:                   # validation + test
+    - {name: to_tensor}
+    - {name: center_crop, size: 224}
+    - {name: normalize}
+
+model:                    # keyword arguments of net.model.model.Net (any timm model name)
+  name: hf_hub:mwalmsley/zoobot-encoder-convnext_tiny
+  num_classes: 10
+  pretrained: true
+  grad_checkpointing: true
+
+loss: {name: CrossEntropyLoss, weight: balanced}   # inverse class frequency
+optimizer: {name: AdamW, lr: 1.0e-4, weight_decay: 0.05}
+scheduler: {name: CosineAnnealingLR, T_max: 30}
+
+train:
+  epochs: 30
+  monitor: val_macro_f1   # history.csv column that selects best.pt
+  mode: max
+  patience: 5             # early stop after this many epochs without improvement
+  amp: true               # float16 autocast on mps / cuda
+  resume: null            # e.g. experiments/<run>/checkpoints.nosync/last.pt
+  resume_optimizer: false # true = also optimizer, scheduler, epoch counter
+
+inference:
+  checkpoint: null        # set to this run's best.pt when training ends
+  split: test
+  after_train: true       # test the best checkpoint right after training
