@@ -46,7 +46,7 @@ scheduler: {name: CosineAnnealingLR, T_max: 30}
 
 train:
   epochs: 30
-  monitor: val_macro_f1   # history.csv column that selects best.pt
+  monitor: val_macro_f1   # logs/log_epoch.csv column that selects best.pt
   mode: max
   patience: 5             # early stop after this many epochs without improvement
   amp: true               # float16 autocast on mps / cuda

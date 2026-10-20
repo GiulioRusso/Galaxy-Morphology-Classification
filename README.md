@@ -1,6 +1,6 @@
 # Galaxy Morphology Classification
 
-A leakage-free, reproducible 10-class benchmark on Galaxy10 DECaLS. It compares handcrafted features, ImageNet-pretrained CNNs and a Galaxy Zoo-pretrained encoder. Every number below is generated from committed outputs.
+A leakage-free, reproducible 10-class benchmark on Galaxy10 DECaLS. It compares handcrafted features, ImageNet-pretrained CNNs and a Galaxy Zoo-pretrained encoder. Every number below is generated from the committed experiment logs.
 
 <!-- HEADLINE:START -->
 _No results yet: train with `scripts/main.py`, then run `scripts/make_results_table.py`._
