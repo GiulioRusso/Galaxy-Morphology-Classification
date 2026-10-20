@@ -1,7 +1,8 @@
 """Sample transforms: plain functions `(image, label) -> (image, label)`, listed per stage in the config.
 
     transforms:
-      train: [{name: to_tensor}, {name: d4}, {name: random_crop, size: 224}, {name: color_jitter, ...}, {name: normalize}]
+      train: [{name: to_tensor}, {name: d4}, {name: random_crop, size: 224}, {name: color_jitter, ...},
+             {name: normalize}]
       eval:  [{name: to_tensor}, {name: center_crop, size: 224}, {name: normalize}]
 
 Randomness uses torch's RNG, which DataLoader seeds per worker.
