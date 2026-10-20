@@ -2,24 +2,24 @@
 # Caveat: GZ Evo includes GZ DECaLS, the source of Galaxy10 DECaLS labels, so test galaxies were likely seen
 # (with their votes) during pretraining. See docs/related_work.md.
 # loss/sampler: set to the winner of the B1 imbalance study.
-#   train + test: uv run scripts/main.py config/b3_zoobot.yaml seed=0      (seed 0|1|2 also selects the split)
-#   override:     uv run scripts/main.py config/b3_zoobot.yaml seed=1 train.epochs=5 data.limit=128
+#   train + test: uv run scripts/main.py config/b3_zoobot.yaml
+#   override:     uv run scripts/main.py config/b3_zoobot.yaml train.epochs=1 data.limit=128
 #   reproduce:    uv run scripts/main.py experiments/<run>/parameters.yaml
 #   test again:   uv run scripts/inference.py experiments/<run>/parameters.yaml
 # Write floats as 1.0e-3, not 1e-3 (YAML 1.1 reads the latter as a string).
 
 framework: dl
-name: b3_zoobot
+name: null                # experiment folder suffix; null = this file name
 title: "B3 Zoobot ConvNeXt-Tiny (Galaxy Zoo)"
 output_dir: experiments
-seed: 0
+seed: 0                   # initialisation and data order
 deterministic: false
 device: auto              # auto | cpu | cuda | mps
 mps_memory_fraction: 0.4  # Apple silicon: cap GPU memory so overuse raises an error instead of freezing macOS
 
 data:
   images: data/Galaxy10_DECals.npy
-  splits: splits/galaxy10_seed{seed}.csv
+  split: splits/galaxy10.csv
   limit: null             # images per split, for quick debugging
   sampler: false          # class-balanced WeightedRandomSampler for training
   batch_size: 32

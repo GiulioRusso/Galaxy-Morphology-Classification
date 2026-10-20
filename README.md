@@ -42,20 +42,21 @@ v2 splits before any augmentation, keeps all 10 classes, removes conflicting dup
 
 - **Cleaning:** blank images and pixel-identical copies with conflicting labels are found by pixel checks and logged, not hardcoded.
 - **Overlap groups:** cutouts within 60″ of each other on the sky overlap and share pixels (measured correlation on the overlap ≈ 0.94–0.99). They form one group, and a group never spans two splits.
-- **Splits:** stratified 70/15/15 by galaxy group for seeds 0, 1 and 2, committed as `splits/galaxy10_seed{N}.csv`. Tests check disjointness and that every class appears in every split.
+- **Split:** one stratified 70/15/15 split by galaxy group (seed 0), committed as `splits/galaxy10.csv`. Tests check disjointness and that every class appears in every split.
 - **Augmentation:** applied on the fly to training images only. It uses the D4 dihedral group (90° rotations × flips; galaxies have no preferred orientation), a random 224 crop from the 256 image, and mild brightness and contrast jitter.
-- **Model selection:** early stopping and model choice use validation macro-F1. The test set is read once per run.
+- **Metric:** macro-F1 over the 10 classes, plus per-class F1. Accuracy is not reported: with imbalanced classes it is dominated by the large ones.
+- **Model selection:** early stopping, the best checkpoint and the model choice use validation macro-F1. Loss is logged for train and validation. The test set is read once per run.
 - **Class imbalance:** weighted cross-entropy, focal loss and a class-balanced sampler are compared on B1, and the winner is picked by validation macro-F1.
 
 ## Results
 
-Mean ± std over 3 seeds, 10 classes, test set. The 4-superclass score is computed from the 10-class predictions (no separate training).
+One run per model (seed 0), 10 classes, test set. Validation macro-F1 is the best epoch's, which selected the checkpoint.
 
 <!-- RESULTS:START -->
 _No results yet: train with `scripts/main.py`, then run `scripts/make_results_table.py`._
 <!-- RESULTS:END -->
 
-Per-class F1 of the best model (selected by validation macro-F1):
+Per-class test F1:
 
 <!-- PERCLASS:START -->
 _No results yet: train with `scripts/main.py`, then run `scripts/make_results_table.py`._
@@ -65,7 +66,7 @@ Error analysis (most-confused class pairs with examples): [`notebooks/error_anal
 
 ## Comparison with published work
 
-Published Galaxy10 DECaLS results report top-1 accuracy between about 73% and 95%. None of them uses a duplicate-aware split, and the splits are not shared. Our numbers are therefore **not directly comparable**. The table, protocols and caveats are in [`docs/related_work.md`](docs/related_work.md). In particular, the Zoobot encoder (B3) was pretrained on Galaxy Zoo votes that very likely include our test galaxies.
+Published Galaxy10 DECaLS results report top-1 accuracy (about 73% to 95%), while we report macro-F1. None of them uses a duplicate-aware split, and the splits are not shared. The numbers are therefore **not comparable**. The table, protocols and caveats are in [`docs/related_work.md`](docs/related_work.md). In particular, the Zoobot encoder (B3) was pretrained on Galaxy Zoo votes that very likely include our test galaxies.
 
 ## Reproduce
 
@@ -73,24 +74,28 @@ Requires [uv](https://docs.astral.sh/uv/). Configs are sized for a 16 GB Apple-s
 
 ```bash
 uv sync
-uv run scripts/download_data.py                              # h5 (2.7 GB, MD5-checked, resumable)
-uv run scripts/preprocess.py config/preprocess.yaml          # .npy + splits (already committed in splits/)
-for s in 0 1 2; do uv run scripts/main.py config/b3_zoobot.yaml seed=$s; done   # train + test
-uv run scripts/make_results_table.py                         # regenerate the tables in this README
+uv run scripts/download_data.py                        # h5 (2.7 GB, MD5-checked, resumable)
+uv run scripts/preprocess.py config/preprocess.yaml    # .npy + split (the split is already committed in splits/)
+uv run scripts/main.py config/b3_zoobot.yaml           # train, then test the best checkpoint
+uv run scripts/make_results_table.py                   # regenerate the tables in this README
 ```
 
-Every run, training and test, writes into one folder (layout of [AI-template](https://github.com/GiulioRusso/AI-template)):
+Training and test of a run write into one folder (layout of [AI-template](https://github.com/GiulioRusso/AI-template)). The folder suffix is the config file name, unless `name:` is set in the config:
 
 ```
-experiments/<timestamp>_<name>_seed<N>/
-  parameters.yaml        full resolved config + git commit: reproduces the run, drives inference
-  run.log
-  history.csv            one row per epoch: train/val loss and every metric, lr, seconds
-  steps.csv              one row per training step: loss, batch accuracy, lr
-  plots/                 loss, macro_f1, acc, ..., per_class_f1, steps, lr, val_confusion_matrix (rewritten each epoch)
-  checkpoints.nosync/    best.pt, last.pt (not committed; .nosync keeps them out of iCloud)
-  inference_<timestamp>/ parameters.yaml, run.log, predictions.csv, metrics.csv,
-                         plots/ confusion_matrix, reliability, examples (most confident correct and wrong per class)
+experiments/<timestamp>_<config name>/
+  parameters.yaml          full resolved config + git commit: reproduces the run, drives inference
+  logs/
+    train.log
+    log_epoch.csv          one row per epoch: train loss, val loss, val macro-F1, val F1 per class, lr, seconds
+    log_steps.csv          one row per training step: loss, lr
+  plots/                   loss, loss_steps, macro_f1, per_class_f1, lr, val_confusion_matrix (rewritten every epoch)
+  checkpoints.nosync/      best.pt (best val macro-F1), last.pt (B0: model.joblib); not committed, out of iCloud
+  inference_<timestamp>/
+    parameters.yaml
+    logs/test.log, logs/log_test.csv   test macro-F1 and F1 per class
+    predictions.csv                    image_id, label, class probabilities
+    plots/                             confusion_matrix, examples (most confident correct and wrong per class)
 ```
 
 Any config key can be overridden as `key.sub=value`, e.g. `data.limit=128 train.epochs=1` for a quick debug run. Re-test a run with `uv run scripts/inference.py experiments/<run>/parameters.yaml`, resume one with `train.resume=experiments/<run>/checkpoints.nosync/last.pt train.resume_optimizer=true`. Checks: `uv run pytest`, `uv run ruff check`.
@@ -105,6 +110,6 @@ Any config key can be overridden as `key.sub=value`, e.g. `data.limit=128 train.
 ## Limitations
 
 - Labels are volunteer-vote thresholds, so neighbouring classes (e.g. Disturbed vs Merging, tight vs loose spiral) overlap.
-- Cigar Shaped Smooth has only 334 images, so its F1 is noisy across seeds.
+- One run per model (seed 0): differences of a few F1 points can be run-to-run noise. Cigar Shaped Smooth has only 333 images (≈50 in test), so its F1 is the noisiest.
 - The data comes from a single survey (DECaLS imaging), and transfer to other surveys is not tested.
 - B3's pretraining likely includes the test galaxies' Galaxy Zoo votes (see above).

@@ -21,9 +21,9 @@ from net.utils.seed import seed_everything
 
 
 def train(cfg: dict) -> None:
-    """Writes experiments/<timestamp>_<name>_seed<N>/:
-    parameters.yaml, run.log, history.csv (per epoch), steps.csv (per step), plots/, checkpoints.nosync/{best,last}.pt
-    and, with inference.after_train, the test run in inference_<timestamp>/.
+    """Writes experiments/<timestamp>_<name>/: parameters.yaml, logs/{train.log, log_epoch.csv, log_steps.csv},
+    plots/ (rewritten every epoch), checkpoints.nosync/{best,last}.pt and, with inference.after_train,
+    the test run in inference_<timestamp>/.
     """
     exp = new_experiment(cfg)
     seed_everything(cfg["seed"], cfg["deterministic"])
@@ -52,17 +52,16 @@ def train(cfg: dict) -> None:
 
     ckpt_dir, plots = exp / CKPT_DIR, exp / "plots"
     ckpt_dir.mkdir()
-    history, steps = CSVLog(exp / "history.csv"), CSVLog(exp / "steps.csv")
+    history, steps = CSVLog(exp / "logs" / "log_epoch.csv"), CSVLog(exp / "logs" / "log_steps.csv")
     logger.info(f"device={device} amp={amp} train={len(train_loader.dataset)} val={len(val_loader.dataset)} "
                 f"class counts={counts.tolist()}")
     for epoch in range(first_epoch, t["epochs"] + 1):
         start = time.perf_counter()
         lr = optimizer.param_groups[0]["lr"]
-        train_loss, tp, ty = run_epoch(model, train_loader, loss_fn, device, optimizer, scaler, amp, steps, epoch)
+        train_loss, _, _ = run_epoch(model, train_loader, loss_fn, device, optimizer, scaler, amp, steps, epoch)
         val_loss, vp, vy = run_epoch(model, val_loader, loss_fn, device, amp=amp)
-        row = {"epoch": epoch, "train_loss": train_loss,
-               **{f"train_{k}": v for k, v in compute_metrics(ty, tp).items()},
-               "val_loss": val_loss, **{f"val_{k}": v for k, v in compute_metrics(vy, vp).items()},
+        row = {"epoch": epoch, "train_loss": train_loss, "val_loss": val_loss,
+               **{f"val_{k}": v for k, v in compute_metrics(vy, vp).items()},
                "lr": lr, "seconds": time.perf_counter() - start}
 
         if isinstance(scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
@@ -79,11 +78,10 @@ def train(cfg: dict) -> None:
             stale += 1
         save_checkpoint(ckpt_dir / "last.pt", model, optimizer, scheduler, epoch, best)
         history.write(row)
-        plot_history(exp / "history.csv", plots)
-        plot_steps(exp / "steps.csv", plots)
+        plot_history(exp / "logs" / "log_epoch.csv", plots)
+        plot_steps(exp / "logs" / "log_steps.csv", plots)
         logger.info(f"epoch {epoch:03d}/{t['epochs']}  train_loss={train_loss:.4f}  val_loss={val_loss:.4f}  "
-                    f"train_macro_f1={row['train_macro_f1']:.4f}  val_macro_f1={row['val_macro_f1']:.4f}  "
-                    f"val_acc={row['val_acc']:.4f}  lr={lr:.3g}  ({row['seconds']:.0f}s)"
+                    f"val_macro_f1={row['val_macro_f1']:.4f}  lr={lr:.3g}  ({row['seconds']:.0f}s)"
                     + ("  *best*" if improved else ""))
         if stale >= t["patience"]:
             logger.info(f"early stop: no {t['monitor']} improvement for {stale} epochs")

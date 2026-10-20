@@ -1,7 +1,7 @@
 """Galaxy10 DECaLS: image cleaning, overlap grouping, leakage-free splits.
 
     uv run scripts/preprocess.py config/preprocess.yaml
-    # -> data/Galaxy10_DECals.npy + splits/galaxy10_seed{0,1,2}.csv + splits/dropped.csv
+    # -> data/Galaxy10_DECals.npy + splits/galaxy10.csv + splits/dropped.csv
 
 image_id is the row index in Galaxy10_DECals.h5 and never changes (no renaming).
 The h5 is gzip-chunked across 555 images per chunk, so reading one image decompresses ~100 MB;
@@ -78,7 +78,7 @@ def make_split(labels, groups, seed):
     return split_of[groups].to_numpy()
 
 
-def prepare(h5_path, splits_dir, seeds, radius_arcsec=GROUP_RADIUS_ARCSEC):
+def prepare(h5_path, splits_dir, seed=0, radius_arcsec=GROUP_RADIUS_ARCSEC):
     npy = Path(h5_path).with_suffix(".npy")
     with h5py.File(h5_path, "r") as f:
         labels, ra, dec = f["ans"][:].astype(int), f["ra"][:], f["dec"][:]
@@ -98,8 +98,7 @@ def prepare(h5_path, splits_dir, seeds, radius_arcsec=GROUP_RADIUS_ARCSEC):
     sizes = np.bincount(groups)
     logger.info(f"{len(keep)} images, {len(sizes)} groups, {(sizes > 1).sum()} multi-image groups "
                 f"covering {sizes[sizes > 1].sum()} images (radius {radius_arcsec}\")")
-    for seed in seeds:
-        df = pd.DataFrame(dict(image_id=keep, label=labels[keep], group=groups,
-                               split=make_split(labels[keep], groups, seed)))
-        df.to_csv(Path(splits_dir) / f"galaxy10_seed{seed}.csv", index=False)
-        logger.info(f"seed {seed}: {df.split.value_counts().to_dict()}")
+    df = pd.DataFrame(dict(image_id=keep, label=labels[keep], group=groups,
+                           split=make_split(labels[keep], groups, seed)))
+    df.to_csv(Path(splits_dir) / "galaxy10.csv", index=False)
+    logger.info(f"split (seed {seed}): {df.split.value_counts().to_dict()}")

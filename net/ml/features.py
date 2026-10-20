@@ -15,7 +15,6 @@ import numpy as np
 import pandas as pd
 from skimage.feature import graycomatrix, graycoprops, local_binary_pattern
 
-from net.data.dataset import split_csv
 from net.utils.config import relative_to_root, resolve
 from net.utils.logger import logger
 
@@ -102,7 +101,7 @@ def compute(images_path, ids, workers=None):
 
 def features(cfg: dict, ids) -> np.ndarray:
     """Feature matrix for image ids. data.features_cache holds every image of the split CSV (input data, like
-    the .npy), so it is computed once (~2 min on 8 processes) and shared by all seeds."""
+    the .npy), so it is computed once (~2 min on 8 processes) and shared by all runs."""
     images, cache = resolve(cfg["data"]["images"]), resolve(cfg["data"]["features_cache"])
     if cache.exists():
         z = np.load(cache)
@@ -110,7 +109,7 @@ def features(cfg: dict, ids) -> np.ndarray:
             return pd.DataFrame(z["X"], index=z["ids"]).loc[ids].to_numpy()
     if cfg["data"]["limit"]:  # debug subset: no cache
         return compute(images, ids, cfg["data"]["workers"])
-    all_ids = pd.read_csv(split_csv(cfg)).image_id.to_numpy()
+    all_ids = pd.read_csv(resolve(cfg["data"]["split"])).image_id.to_numpy()
     logger.info(f"computing handcrafted features for {len(all_ids)} images -> {relative_to_root(cache)}")
     np.savez(cache, ids=all_ids, X=compute(images, all_ids, cfg["data"]["workers"]))
     return features(cfg, ids)

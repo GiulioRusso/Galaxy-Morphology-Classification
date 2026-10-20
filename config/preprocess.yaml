@@ -1,5 +1,5 @@
 # uv run scripts/preprocess.py config/preprocess.yaml
 h5: data/Galaxy10_DECals.h5        # from scripts/download_data.py; converted once to data/Galaxy10_DECals.npy
 splits_dir: splits
-seeds: [0, 1, 2]
+seed: 0                             # split seed
 group_radius_arcsec: 60.0           # cutouts closer than this overlap on the sky and share a split

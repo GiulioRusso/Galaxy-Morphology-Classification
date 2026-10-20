@@ -22,5 +22,5 @@ def fake(tmp_path_factory):
     h5 = d / "fake.h5"
     with h5py.File(h5, "w") as f:
         f["images"], f["ans"], f["ra"], f["dec"] = images, labels, ra, dec
-    prepare(h5, d / "splits", seeds=[0])
+    prepare(h5, d / "splits")
     return dict(h5=h5, npy=h5.with_suffix(".npy"), splits=d / "splits", images=images, labels=labels)

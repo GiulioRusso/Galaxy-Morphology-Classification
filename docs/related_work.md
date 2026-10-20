@@ -1,6 +1,6 @@
 # Published results on Galaxy10 DECaLS
 
-**Bottom line: no published number below is directly comparable to ours.** Galaxy10 DECaLS has no canonical train/test split, and none of these papers removes duplicate galaxies before splitting. All of them report top-1 accuracy, while our primary metric is macro-F1. We report top-1 accuracy too, so the numbers can be read side by side, but differences of a few points mean little across protocols.
+**Bottom line: no published number below is directly comparable to ours.** Galaxy10 DECaLS has no canonical train/test split, and none of these papers removes duplicate galaxies before splitting. All of them report top-1 accuracy, while we report only macro-F1 and per-class F1 (accuracy is dominated by the large classes), so no number below can be read side by side with ours.
 
 Walmsley et al. (2024, App. D.4) state the problem directly: published Galaxy10 DECaLS accuracies are hard to assess "due to dataset limitations (including duplicates, substantial class confusion, limited label precision, and lack of a canonical train/test split)".
 
@@ -15,10 +15,10 @@ Walmsley et al. (2024, App. D.4) state the problem directly: published Galaxy10 
 
 ## How our protocol differs
 
-- **Duplicates removed, overlaps grouped.** The release contains 59 pixel-identical image pairs whose two copies have different labels; we drop both copies. Cutouts within 60″ on the sky overlap and are grouped, and each group goes entirely into train, val or test (`net/data/preprocessing.py`). We use stratified 70/15/15 splits with 3 seeds, and the split files are committed.
+- **Duplicates removed, overlaps grouped.** The release contains 59 pixel-identical image pairs whose two copies have different labels; we drop both copies. Cutouts within 60″ on the sky overlap and are grouped, and each group goes entirely into train, val or test (`net/data/preprocessing.py`). We use one stratified 70/15/15 split (seed 0), and the split file is committed.
 - **No offline augmentation.** D4 rotations and flips are applied on the fly, to training images only.
 - **Model selection on validation only.** The test set is read once per run.
-- **Macro-F1 as the primary metric.** The classes range from 334 to 2,645 images, and accuracy hides failures on the small ones.
+- **Macro-F1 as the only metric.** The classes range from 334 to 2,645 images, and accuracy hides failures on the small ones.
 
 ## Caveat for B3 (Zoobot)
 

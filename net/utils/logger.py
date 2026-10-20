@@ -1,6 +1,6 @@
 """Project logger: `from net.utils.logger import logger; logger.info(...)`.
 
-Prints to the terminal and, once an experiment starts, also to its run.log.
+Prints to the terminal and, once an experiment starts, also to its logs/train.log (or logs/test.log).
 """
 
 from __future__ import annotations

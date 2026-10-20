@@ -14,7 +14,7 @@ from net.utils.logger import setup_logger
 def main(argv: list[str] | None = None) -> None:
     cfg = load_config(argv)
     setup_logger()
-    prepare(resolve(cfg["h5"]), resolve(cfg["splits_dir"]), cfg["seeds"], cfg["group_radius_arcsec"])
+    prepare(resolve(cfg["h5"]), resolve(cfg["splits_dir"]), cfg["seed"], cfg["group_radius_arcsec"])
 
 
 if __name__ == "__main__":

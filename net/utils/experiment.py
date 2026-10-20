@@ -38,18 +38,18 @@ def save_parameters(cfg: dict, path: Path) -> None:
     path.write_text(header + yaml.safe_dump(cfg, sort_keys=False))
 
 
-def new_experiment(cfg: dict, parent: Path | None = None, prefix: str = "") -> Path:
-    """Create `<parent>/<prefix><timestamp>[_<name>]/` with parameters.yaml and run.log."""
+def new_experiment(cfg: dict, parent: Path | None = None, prefix: str = "", log: str = "train.log") -> Path:
+    """Create `<parent>/<prefix><timestamp>[_<name>]/` with parameters.yaml and logs/<log>."""
     parent = parent or resolve(cfg["output_dir"])
     stem = prefix + datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    if not prefix:  # training run: <timestamp>_<name>_seed<N>
-        stem += (f"_{cfg['name']}" if cfg.get("name") else "") + f"_seed{cfg['seed']}"
+    if not prefix:  # training run: <timestamp>_<name>
+        stem += f"_{cfg['name']}" if cfg.get("name") else ""
     exp, i = parent / stem, 1
     while exp.exists():  # two runs in the same second
         exp, i = parent / f"{stem}-{i}", i + 1
-    exp.mkdir(parents=True)
+    (exp / "logs").mkdir(parents=True)
 
-    setup_logger(exp / "run.log")
+    setup_logger(exp / "logs" / log)
     save_parameters(cfg, exp / "parameters.yaml")
     logger.info(f"experiment: {relative_to_root(exp)}")
     return exp

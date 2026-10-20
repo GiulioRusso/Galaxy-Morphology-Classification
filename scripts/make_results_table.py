@@ -1,13 +1,12 @@
-"""Aggregate experiments/*/ (mean ± std over seeds) into README.md between markers.
+"""Collect experiments/*/ into README.md between markers.
 
     uv run scripts/make_results_table.py
 
-Per (name, seed) the latest training run with a test run is used: test metrics from its latest
-inference_*/metrics.csv, validation macro-F1 = best val_macro_f1 in its history.csv.
+Per config name, the latest training run with a test run is used: test F1 from its latest
+inference_*/logs/log_test.csv, validation macro-F1 = best val_macro_f1 in its logs/log_epoch.csv.
+The headline model is the one with the best *validation* macro-F1, so test numbers never drive model selection.
 
 Markers: DATASET (class counts from splits/), HEADLINE, RESULTS, PERCLASS.
-The headline/per-class model is the one with the best mean
-*validation* macro-F1, so test numbers never drive model selection.
 """
 import re
 from pathlib import Path
@@ -19,50 +18,36 @@ from net.data.dataset import CLASSES
 
 ROOT = Path(__file__).resolve().parents[1]
 README = ROOT / "README.md"
-COLS = [("macro_f1", "Test macro-F1"), ("balanced_acc", "Balanced acc."), ("acc", "Top-1 acc."),
-        ("ece", "ECE ↓"), ("super4_macro_f1", "4-superclass macro-F1"), ("val_macro_f1", "Val macro-F1")]
 
 
 def load(experiments=ROOT / "experiments"):
     runs = {}
-    for run in sorted(experiments.glob("*/parameters.yaml")):  # timestamped names: later runs overwrite earlier
-        tests = sorted(run.parent.glob("inference_*/metrics.csv"))
-        cfg = yaml.safe_load(run.read_text())
+    for params in sorted(experiments.glob("*/parameters.yaml")):  # timestamped names: later runs overwrite earlier
+        run, cfg = params.parent, yaml.safe_load(params.read_text())
+        tests = sorted(run.glob("inference_*/logs/log_test.csv"))
         if tests and cfg["inference"]["split"] == "test" and not cfg["data"]["limit"]:  # skip debug runs
-            val = pd.read_csv(run.parent / "history.csv").val_macro_f1.max()
-            runs[cfg["name"], cfg["seed"]] = pd.read_csv(tests[-1]).assign(
-                name=cfg["name"], seed=cfg["seed"], title=cfg.get("title", cfg["name"]), val_macro_f1=val)
-    return pd.concat(runs.values(), ignore_index=True) if runs else None
-
-
-def title(df, name):
-    return df.loc[df.name == name, "title"].iloc[-1]
-
-
-def pm(s):
-    return f"{s.mean():.3f} ± {s.std(ddof=1):.3f}" if len(s) > 1 else f"{s.mean():.3f}"
+            val = pd.read_csv(run / "logs" / "log_epoch.csv").val_macro_f1.max()
+            runs[cfg["name"]] = pd.read_csv(tests[-1]).assign(
+                name=cfg["name"], title=cfg.get("title", cfg["name"]), val_macro_f1=val, run=run.name)
+    return pd.concat(runs.values(), ignore_index=True).sort_values("title") if runs else None
 
 
 def render(df):
     if df is None:
         empty = "_No results yet: train with `scripts/main.py`, then run `scripts/make_results_table.py`._"
         return empty, empty, empty
-    groups = df.groupby("name")
-    order = sorted(groups.groups, key=lambda n: title(df, n))
-    lines = ["| Model | Seeds | " + " | ".join(h for _, h in COLS) + " |", "|---" * (len(COLS) + 2) + "|"]
-    for n in order:
-        g = groups.get_group(n)
-        lines.append(f"| {title(df, n)} | {len(g)} | " + " | ".join(pm(g[c]) for c, _ in COLS) + " |")
-    best = groups.val_macro_f1.mean().idxmax()
-    g = groups.get_group(best)
-    headline = (f"**Best model (by validation macro-F1): {title(df, best)}. Test macro-F1 {pm(g.macro_f1)} "
-                f"on all 10 classes ({len(g)} seeds).**")
-    per = ["| Class | F1 |", "|---|---|"] + [f"| {k} {c} | {pm(g[f'f1_{k}'])} |" for k, c in enumerate(CLASSES)]
+    best = df.loc[df.val_macro_f1.idxmax()]
+    headline = (f"**Best model (by validation macro-F1): {best.title}. "
+                f"Test macro-F1 {best.macro_f1:.3f} on all 10 classes.**")
+    lines = ["| Model | Test macro-F1 | Val macro-F1 |", "|---|---|---|"]
+    lines += [f"| {r.title} | {r.macro_f1:.3f} | {r.val_macro_f1:.3f} |" for r in df.itertuples()]
+    per = ["| Class | " + " | ".join(df.name) + " |", "|---" * (len(df) + 1) + "|"]
+    per += [f"| {k} {c} | " + " | ".join(f"{v:.3f}" for v in df[f"f1_{k}"]) + " |" for k, c in enumerate(CLASSES)]
     return headline, "\n".join(lines), "\n".join(per)
 
 
 def dataset_table(splits=ROOT / "splits"):
-    kept = pd.read_csv(splits / "galaxy10_seed0.csv")
+    kept = pd.read_csv(splits / "galaxy10.csv")
     dropped = pd.read_csv(splits / "dropped.csv")
     n_kept = kept.label.value_counts().reindex(range(len(CLASSES)), fill_value=0)
     n_drop = dropped.label.value_counts().reindex(range(len(CLASSES)), fill_value=0)
