@@ -1,0 +1,2 @@
+2026-10-20 22:08:13 | INFO    | experiment: experiments/2026-10-20_22-08-04_handcrafted_hgb/inference_2026-10-20_22-08-13
+2026-10-20 22:08:14 | INFO    | test: macro_f1=0.7114  per-class F1: 0.358 0.707 0.899 0.864 0.686 0.682 0.640 0.538 0.847 0.894

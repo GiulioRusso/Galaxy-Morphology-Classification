@@ -3,7 +3,7 @@
 A leakage-free, reproducible 10-class benchmark on Galaxy10 DECaLS. It compares handcrafted features, ImageNet-pretrained CNNs and a Galaxy Zoo-pretrained encoder. Every number below is generated from the committed experiment logs.
 
 <!-- HEADLINE:START -->
-_No results yet: run `launch/train.sh`._
+**Best model (by validation macro-F1): ResNet-50 (ImageNet), weighted cross-entropy. Test macro-F1 0.862 on all 10 classes.**
 <!-- HEADLINE:END -->
 
 <img src="./images/galaxy10_example.png">
@@ -45,7 +45,7 @@ v2 splits before any augmentation, keeps all 10 classes, removes conflicting dup
 - **Split:** one stratified 70/15/15 split by galaxy group (seed 0), committed as `splits/galaxy10.csv`. Tests check disjointness and that every class appears in every split.
 - **Augmentation:** applied on the fly to training images only. It uses the D4 dihedral group (90° rotations × flips; galaxies have no preferred orientation), a random 224 crop from the 256 image, and mild brightness and contrast jitter.
 - **Metric:** macro-F1 over the 10 classes, plus per-class F1. Accuracy is not reported: with imbalanced classes it is dominated by the large ones.
-- **Model selection:** early stopping, the best checkpoint and the model choice use validation macro-F1. Loss is logged for train and validation. The test set is read once per run.
+- **Model selection:** every run follows the full 30-epoch cosine schedule (no early stopping: with the learning rate still high, validation F1 swings by ±0.03 per epoch and stopped a run at epoch 11). The checkpoint with the best validation macro-F1 is kept, and the model choice also uses validation macro-F1. Loss is logged for train and validation. The test set is read once per run.
 - **Class imbalance:** weighted cross-entropy, focal loss and a class-balanced sampler are compared on ResNet-50, and the winner is picked by validation macro-F1.
 
 ## Results
@@ -53,13 +53,27 @@ v2 splits before any augmentation, keeps all 10 classes, removes conflicting dup
 One run per model (seed 0), 10 classes, test set. Validation macro-F1 is the best epoch's, which selected the checkpoint.
 
 <!-- RESULTS:START -->
-_No results yet: run `launch/train.sh`._
+| Model | Test macro-F1 | Val macro-F1 |
+|---|---|---|
+| Handcrafted features + gradient boosting | 0.711 | 0.720 |
+| ResNet-50 (ImageNet), weighted cross-entropy | 0.862 | 0.859 |
 <!-- RESULTS:END -->
 
 Per-class test F1:
 
 <!-- PERCLASS:START -->
-_No results yet: run `launch/train.sh`._
+| Class | handcrafted_hgb | resnet50_wce |
+|---|---|---|
+| 0 Disturbed | 0.358 | 0.616 |
+| 1 Merging | 0.707 | 0.903 |
+| 2 Round Smooth | 0.899 | 0.945 |
+| 3 In-between Round Smooth | 0.864 | 0.929 |
+| 4 Cigar Shaped Smooth | 0.686 | 0.860 |
+| 5 Barred Spiral | 0.682 | 0.907 |
+| 6 Unbarred Tight Spiral | 0.640 | 0.796 |
+| 7 Unbarred Loose Spiral | 0.538 | 0.782 |
+| 8 Edge-on no Bulge | 0.847 | 0.922 |
+| 9 Edge-on with Bulge | 0.894 | 0.960 |
 <!-- PERCLASS:END -->
 
 Error analysis (most-confused class pairs with examples): [`notebooks/error_analysis.ipynb`](notebooks/error_analysis.ipynb).

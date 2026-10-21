@@ -83,7 +83,7 @@ def train(cfg: dict) -> None:
         logger.info(f"epoch {epoch:03d}/{t['epochs']}  train_loss={train_loss:.4f}  val_loss={val_loss:.4f}  "
                     f"val_macro_f1={row['val_macro_f1']:.4f}  lr={lr:.3g}  ({row['seconds']:.0f}s)"
                     + ("  *best*" if improved else ""))
-        if stale >= t["patience"]:
+        if t["patience"] and stale >= t["patience"]:
             logger.info(f"early stop: no {t['monitor']} improvement for {stale} epochs")
             break
     history.close(), steps.close()

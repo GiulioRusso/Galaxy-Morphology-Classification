@@ -48,7 +48,7 @@ train:
   epochs: 30
   monitor: val_macro_f1   # logs/log_epoch.csv column that selects best.pt
   mode: max
-  patience: 5             # early stop after this many epochs without improvement
+  patience: null          # early stop after this many epochs without improvement; null = full schedule
   amp: true               # float16 autocast on mps / cuda
   resume: null            # e.g. experiments/<run>/checkpoints.nosync/last.pt
   resume_optimizer: false # true = also optimizer, scheduler, epoch counter
