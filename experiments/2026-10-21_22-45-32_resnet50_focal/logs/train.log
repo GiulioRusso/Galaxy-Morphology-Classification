@@ -1,0 +1,27 @@
+2026-10-21 22:45:32 | INFO    | experiment: experiments/2026-10-21_22-45-32_resnet50_focal
+2026-10-21 22:45:33 | INFO    | resumed from experiments/2026-10-21_17-42-32_resnet50_focal/checkpoints.nosync/last.pt (full state), starting at epoch 8
+2026-10-21 22:45:33 | INFO    | device=mps amp=True train=12330 val=2645 class counts=[736, 1285, 1845, 1415, 233, 1427, 1273, 1818, 993, 1305]
+2026-10-21 22:49:58 | INFO    | epoch 008/30  train_loss=0.2679  val_loss=0.2935  val_macro_f1=0.7675  lr=0.000261  (264s)
+2026-10-21 22:54:38 | INFO    | epoch 009/30  train_loss=0.2357  val_loss=0.3101  val_macro_f1=0.7701  lr=0.00025  (279s)
+2026-10-21 22:59:29 | INFO    | epoch 010/30  train_loss=0.2204  val_loss=0.2608  val_macro_f1=0.7898  lr=0.000238  (291s)
+2026-10-21 23:04:29 | INFO    | epoch 011/30  train_loss=0.2087  val_loss=0.2908  val_macro_f1=0.7544  lr=0.000225  (299s)
+2026-10-21 23:09:33 | INFO    | epoch 012/30  train_loss=0.2001  val_loss=0.2935  val_macro_f1=0.7784  lr=0.000211  (304s)
+2026-10-21 23:14:49 | INFO    | epoch 013/30  train_loss=0.1831  val_loss=0.2565  val_macro_f1=0.7905  lr=0.000196  (315s)  *best*
+2026-10-21 23:20:02 | INFO    | epoch 014/30  train_loss=0.1636  val_loss=0.2230  val_macro_f1=0.8054  lr=0.000181  (311s)  *best*
+2026-10-21 23:25:22 | INFO    | epoch 015/30  train_loss=0.1920  val_loss=0.2359  val_macro_f1=0.8289  lr=0.000166  (319s)  *best*
+2026-10-21 23:30:44 | INFO    | epoch 016/30  train_loss=0.1751  val_loss=0.2246  val_macro_f1=0.8276  lr=0.00015  (321s)
+2026-10-21 23:36:02 | INFO    | epoch 017/30  train_loss=0.1662  val_loss=0.2109  val_macro_f1=0.8317  lr=0.000134  (317s)  *best*
+2026-10-21 23:41:15 | INFO    | epoch 018/30  train_loss=0.1553  val_loss=0.2161  val_macro_f1=0.8214  lr=0.000119  (312s)
+2026-10-21 23:46:08 | INFO    | epoch 019/30  train_loss=0.1419  val_loss=0.1916  val_macro_f1=0.8484  lr=0.000104  (292s)  *best*
+2026-10-21 23:51:01 | INFO    | epoch 020/30  train_loss=0.1310  val_loss=0.2156  val_macro_f1=0.8338  lr=8.9e-05  (293s)
+2026-10-21 23:55:56 | INFO    | epoch 021/30  train_loss=0.1191  val_loss=0.2067  val_macro_f1=0.8425  lr=7.5e-05  (294s)
+2026-10-22 00:01:02 | INFO    | epoch 022/30  train_loss=0.1122  val_loss=0.1929  val_macro_f1=0.8446  lr=6.18e-05  (306s)
+2026-10-22 00:05:56 | INFO    | epoch 023/30  train_loss=0.1003  val_loss=0.1918  val_macro_f1=0.8467  lr=4.96e-05  (293s)
+2026-10-22 00:10:51 | INFO    | epoch 024/30  train_loss=0.0942  val_loss=0.1880  val_macro_f1=0.8535  lr=3.85e-05  (294s)  *best*
+2026-10-22 00:15:55 | INFO    | epoch 025/30  train_loss=0.0873  val_loss=0.1836  val_macro_f1=0.8461  lr=2.86e-05  (303s)
+2026-10-22 00:20:52 | INFO    | epoch 026/30  train_loss=0.0819  val_loss=0.1899  val_macro_f1=0.8479  lr=2.01e-05  (296s)
+2026-10-22 00:25:47 | INFO    | epoch 027/30  train_loss=0.0759  val_loss=0.1908  val_macro_f1=0.8540  lr=1.3e-05  (295s)  *best*
+2026-10-22 00:30:50 | INFO    | epoch 028/30  train_loss=0.0735  val_loss=0.1835  val_macro_f1=0.8554  lr=7.34e-06  (302s)  *best*
+2026-10-22 00:35:46 | INFO    | epoch 029/30  train_loss=0.0719  val_loss=0.1837  val_macro_f1=0.8583  lr=3.28e-06  (296s)  *best*
+2026-10-22 00:40:42 | INFO    | epoch 030/30  train_loss=0.0709  val_loss=0.1846  val_macro_f1=0.8591  lr=8.22e-07  (295s)  *best*
+2026-10-22 00:40:42 | INFO    | done: best val_macro_f1=0.8591

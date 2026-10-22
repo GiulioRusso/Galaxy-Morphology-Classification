@@ -1,0 +1,62 @@
+# reproduce: uv run scripts/main.py experiments/2026-10-21_22-45-32_resnet50_focal/inference_2026-10-22_00-41-12/parameters.yaml
+# command:   uv run scripts/main.py config/resnet50_focal.yaml train.resume=experiments/2026-10-21_17-42-32_resnet50_focal/checkpoints.nosync/last.pt train.resume_optimizer=true
+# git:       2518fd2 (dirty)
+# python:    3.11.15 on macOS-26.6.2-arm64-arm-64bit
+
+framework: dl
+name: resnet50_focal
+title: ResNet-50 (ImageNet), focal loss
+output_dir: experiments
+seed: 0
+deterministic: false
+device: auto
+mps_memory_fraction: 0.4
+data:
+  images: data/Galaxy10_DECals.npy
+  split: splits/galaxy10.csv
+  limit: null
+  sampler: false
+  batch_size: 32
+  num_workers: 3
+transforms:
+  train:
+  - name: to_tensor
+  - name: d4
+  - name: random_crop
+    size: 224
+  - name: color_jitter
+    brightness: 0.1
+    contrast: 0.1
+  - name: normalize
+  eval:
+  - name: to_tensor
+  - name: center_crop
+    size: 224
+  - name: normalize
+model:
+  name: resnet50.tv_in1k
+  num_classes: 10
+  pretrained: true
+  grad_checkpointing: true
+loss:
+  name: FocalLoss
+  gamma: 2.0
+optimizer:
+  name: AdamW
+  lr: 0.0003
+  weight_decay: 0.05
+scheduler:
+  name: CosineAnnealingLR
+  T_max: 30
+train:
+  epochs: 30
+  monitor: val_macro_f1
+  mode: max
+  patience: null
+  amp: true
+  resume: experiments/2026-10-21_17-42-32_resnet50_focal/checkpoints.nosync/last.pt
+  resume_optimizer: true
+inference:
+  checkpoint: experiments/2026-10-21_22-45-32_resnet50_focal/checkpoints.nosync/best.pt
+  split: test
+  after_train: true

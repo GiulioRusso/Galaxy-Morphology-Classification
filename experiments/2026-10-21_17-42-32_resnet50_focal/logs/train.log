@@ -1,0 +1,9 @@
+2026-10-21 17:42:32 | INFO    | experiment: experiments/2026-10-21_17-42-32_resnet50_focal
+2026-10-21 17:42:34 | INFO    | device=mps amp=True train=12330 val=2645 class counts=[736, 1285, 1845, 1415, 233, 1427, 1273, 1818, 993, 1305]
+2026-10-21 17:46:42 | INFO    | epoch 001/30  train_loss=0.6721  val_loss=0.5700  val_macro_f1=0.6046  lr=0.0003  (247s)  *best*
+2026-10-21 17:51:00 | INFO    | epoch 002/30  train_loss=0.4384  val_loss=0.3929  val_macro_f1=0.7325  lr=0.000299  (258s)  *best*
+2026-10-21 17:55:32 | INFO    | epoch 003/30  train_loss=0.3827  val_loss=0.3507  val_macro_f1=0.7354  lr=0.000297  (271s)  *best*
+2026-10-21 18:00:16 | INFO    | epoch 004/30  train_loss=0.3448  val_loss=0.3156  val_macro_f1=0.7606  lr=0.000293  (283s)  *best*
+2026-10-21 18:05:00 | INFO    | epoch 005/30  train_loss=0.3245  val_loss=0.3423  val_macro_f1=0.7360  lr=0.000287  (284s)
+2026-10-21 18:09:58 | INFO    | epoch 006/30  train_loss=0.3062  val_loss=0.2638  val_macro_f1=0.7901  lr=0.00028  (297s)  *best*
+2026-10-21 18:15:15 | INFO    | epoch 007/30  train_loss=0.2840  val_loss=0.2896  val_macro_f1=0.7745  lr=0.000271  (316s)

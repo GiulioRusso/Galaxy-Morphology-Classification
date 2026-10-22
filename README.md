@@ -3,7 +3,7 @@
 A leakage-free, reproducible 10-class benchmark on Galaxy10 DECaLS. It compares handcrafted features, ImageNet-pretrained CNNs and a Galaxy Zoo-pretrained encoder. Every number below is generated from the committed experiment logs.
 
 <!-- HEADLINE:START -->
-**Best model (by validation macro-F1): ResNet-50 (ImageNet), weighted cross-entropy. Test macro-F1 0.862 on all 10 classes.**
+**Best model (by validation macro-F1): ResNet-50 (ImageNet), focal loss. Test macro-F1 0.863 on all 10 classes.**
 <!-- HEADLINE:END -->
 
 <img src="./images/galaxy10_example.png">
@@ -56,24 +56,25 @@ One run per model (seed 0), 10 classes, test set. Validation macro-F1 is the bes
 | Model | Test macro-F1 | Val macro-F1 |
 |---|---|---|
 | Handcrafted features + gradient boosting | 0.711 | 0.720 |
+| ResNet-50 (ImageNet), focal loss | 0.863 | 0.859 |
 | ResNet-50 (ImageNet), weighted cross-entropy | 0.862 | 0.859 |
 <!-- RESULTS:END -->
 
 Per-class test F1:
 
 <!-- PERCLASS:START -->
-| Class | handcrafted_hgb | resnet50_wce |
-|---|---|---|
-| 0 Disturbed | 0.358 | 0.616 |
-| 1 Merging | 0.707 | 0.903 |
-| 2 Round Smooth | 0.899 | 0.945 |
-| 3 In-between Round Smooth | 0.864 | 0.929 |
-| 4 Cigar Shaped Smooth | 0.686 | 0.860 |
-| 5 Barred Spiral | 0.682 | 0.907 |
-| 6 Unbarred Tight Spiral | 0.640 | 0.796 |
-| 7 Unbarred Loose Spiral | 0.538 | 0.782 |
-| 8 Edge-on no Bulge | 0.847 | 0.922 |
-| 9 Edge-on with Bulge | 0.894 | 0.960 |
+| Class | handcrafted_hgb | resnet50_focal | resnet50_wce |
+|---|---|---|---|
+| 0 Disturbed | 0.358 | 0.634 | 0.616 |
+| 1 Merging | 0.707 | 0.907 | 0.903 |
+| 2 Round Smooth | 0.899 | 0.947 | 0.945 |
+| 3 In-between Round Smooth | 0.864 | 0.935 | 0.929 |
+| 4 Cigar Shaped Smooth | 0.686 | 0.815 | 0.860 |
+| 5 Barred Spiral | 0.682 | 0.922 | 0.907 |
+| 6 Unbarred Tight Spiral | 0.640 | 0.783 | 0.796 |
+| 7 Unbarred Loose Spiral | 0.538 | 0.783 | 0.782 |
+| 8 Edge-on no Bulge | 0.847 | 0.940 | 0.922 |
+| 9 Edge-on with Bulge | 0.894 | 0.964 | 0.960 |
 <!-- PERCLASS:END -->
 
 Error analysis (most-confused class pairs with examples): [`notebooks/error_analysis.ipynb`](notebooks/error_analysis.ipynb).
