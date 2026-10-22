@@ -1,0 +1,33 @@
+2026-10-22 08:54:31 | INFO    | experiment: experiments/2026-10-22_08-54-31_resnet50_sampler
+2026-10-22 08:54:32 | INFO    | device=mps amp=True train=12330 val=2645 class counts=[736, 1285, 1845, 1415, 233, 1427, 1273, 1818, 993, 1305]
+2026-10-22 09:02:06 | INFO    | epoch 001/30  train_loss=1.0772  val_loss=0.9918  val_macro_f1=0.6436  lr=0.0003  (452s)  *best*
+2026-10-22 09:09:13 | INFO    | epoch 002/30  train_loss=0.8014  val_loss=0.8146  val_macro_f1=0.6970  lr=0.000299  (425s)  *best*
+2026-10-22 09:13:38 | INFO    | epoch 003/30  train_loss=0.6925  val_loss=0.7542  val_macro_f1=0.7351  lr=0.000297  (264s)  *best*
+2026-10-22 09:18:32 | INFO    | epoch 004/30  train_loss=0.6512  val_loss=0.6460  val_macro_f1=0.7589  lr=0.000293  (293s)  *best*
+2026-10-22 09:23:38 | INFO    | epoch 005/30  train_loss=0.5988  val_loss=0.5647  val_macro_f1=0.7900  lr=0.000287  (305s)  *best*
+2026-10-22 09:28:52 | INFO    | epoch 006/30  train_loss=0.5624  val_loss=0.6823  val_macro_f1=0.7486  lr=0.00028  (313s)
+2026-10-22 09:34:12 | INFO    | epoch 007/30  train_loss=0.5317  val_loss=0.6148  val_macro_f1=0.7510  lr=0.000271  (320s)
+2026-10-22 09:39:31 | INFO    | epoch 008/30  train_loss=0.5094  val_loss=0.5582  val_macro_f1=0.7833  lr=0.000261  (318s)
+2026-10-22 09:46:14 | INFO    | epoch 009/30  train_loss=0.4870  val_loss=0.5475  val_macro_f1=0.7924  lr=0.00025  (400s)  *best*
+2026-10-22 09:53:50 | INFO    | epoch 010/30  train_loss=0.4779  val_loss=0.5352  val_macro_f1=0.8125  lr=0.000238  (455s)  *best*
+2026-10-22 09:58:59 | INFO    | epoch 011/30  train_loss=0.4438  val_loss=0.4949  val_macro_f1=0.8133  lr=0.000225  (309s)  *best*
+2026-10-22 10:03:34 | INFO    | epoch 012/30  train_loss=0.4332  val_loss=0.5080  val_macro_f1=0.8004  lr=0.000211  (274s)
+2026-10-22 10:08:32 | INFO    | epoch 013/30  train_loss=0.4174  val_loss=0.4809  val_macro_f1=0.8185  lr=0.000196  (296s)  *best*
+2026-10-22 10:13:27 | INFO    | epoch 014/30  train_loss=0.4011  val_loss=0.4652  val_macro_f1=0.8256  lr=0.000181  (294s)  *best*
+2026-10-22 10:18:21 | INFO    | epoch 015/30  train_loss=0.3874  val_loss=0.4596  val_macro_f1=0.8310  lr=0.000166  (293s)  *best*
+2026-10-22 10:23:15 | INFO    | epoch 016/30  train_loss=0.3543  val_loss=0.4637  val_macro_f1=0.8217  lr=0.00015  (294s)
+2026-10-22 10:28:10 | INFO    | epoch 017/30  train_loss=0.3370  val_loss=0.5052  val_macro_f1=0.8211  lr=0.000134  (294s)
+2026-10-22 10:33:22 | INFO    | epoch 018/30  train_loss=0.3144  val_loss=0.4473  val_macro_f1=0.8364  lr=0.000119  (311s)  *best*
+2026-10-22 10:38:13 | INFO    | epoch 019/30  train_loss=0.2986  val_loss=0.4286  val_macro_f1=0.8507  lr=0.000104  (290s)  *best*
+2026-10-22 10:43:08 | INFO    | epoch 020/30  train_loss=0.2660  val_loss=0.4007  val_macro_f1=0.8563  lr=8.9e-05  (294s)  *best*
+2026-10-22 10:48:04 | INFO    | epoch 021/30  train_loss=0.2630  val_loss=0.4294  val_macro_f1=0.8478  lr=7.5e-05  (295s)
+2026-10-22 10:53:03 | INFO    | epoch 022/30  train_loss=0.2506  val_loss=0.4116  val_macro_f1=0.8492  lr=6.18e-05  (298s)
+2026-10-22 10:58:17 | INFO    | epoch 023/30  train_loss=0.2250  val_loss=0.3884  val_macro_f1=0.8595  lr=4.96e-05  (314s)  *best*
+2026-10-22 11:03:56 | INFO    | epoch 024/30  train_loss=0.2258  val_loss=0.4027  val_macro_f1=0.8541  lr=3.85e-05  (337s)
+2026-10-22 11:09:10 | INFO    | epoch 025/30  train_loss=0.2095  val_loss=0.4106  val_macro_f1=0.8541  lr=2.86e-05  (314s)
+2026-10-22 11:14:49 | INFO    | epoch 026/30  train_loss=0.1979  val_loss=0.3976  val_macro_f1=0.8552  lr=2.01e-05  (339s)
+2026-10-22 11:20:16 | INFO    | epoch 027/30  train_loss=0.1840  val_loss=0.3934  val_macro_f1=0.8568  lr=1.3e-05  (326s)
+2026-10-22 11:25:11 | INFO    | epoch 028/30  train_loss=0.1827  val_loss=0.3965  val_macro_f1=0.8570  lr=7.34e-06  (295s)
+2026-10-22 11:30:02 | INFO    | epoch 029/30  train_loss=0.1800  val_loss=0.3910  val_macro_f1=0.8576  lr=3.28e-06  (290s)
+2026-10-22 11:35:00 | INFO    | epoch 030/30  train_loss=0.1775  val_loss=0.4022  val_macro_f1=0.8577  lr=8.22e-07  (297s)
+2026-10-22 11:35:00 | INFO    | done: best val_macro_f1=0.8595

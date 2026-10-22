@@ -1,5 +1,5 @@
 # Same architecture and ImageNet init as Zoobot; only the Galaxy Zoo pretraining differs.
-# loss/sampler: set to the winner of the ResNet-50 imbalance study.
+# loss/sampler: balanced sampler + plain CE, the winner of the ResNet-50 imbalance study (val macro-F1 0.8595 vs 0.8591 focal, 0.8587 weighted CE).
 #   train + test: uv run scripts/main.py config/convnext_tiny.yaml
 #   override:     uv run scripts/main.py config/convnext_tiny.yaml train.epochs=1 data.limit=128
 #   reproduce:    uv run scripts/main.py experiments/<run>/parameters.yaml
@@ -19,7 +19,7 @@ data:
   images: data/Galaxy10_DECals.npy
   split: splits/galaxy10.csv
   limit: null             # images per split, for quick debugging
-  sampler: false          # class-balanced WeightedRandomSampler for training
+  sampler: true           # class-balanced WeightedRandomSampler for training
   batch_size: 32
   num_workers: 3
 
@@ -41,7 +41,7 @@ model:                    # keyword arguments of net.model.model.Net (any timm m
   pretrained: true
   grad_checkpointing: true
 
-loss: {name: CrossEntropyLoss, weight: balanced}   # inverse class frequency
+loss: {name: CrossEntropyLoss}
 optimizer: {name: AdamW, lr: 1.0e-4, weight_decay: 0.05}
 scheduler: {name: CosineAnnealingLR, T_max: 30}
 
