@@ -45,11 +45,13 @@ def center_crop(x, y, size: int = 224):
 
 
 def color_jitter(x, y, brightness: float = 0.0, contrast: float = 0.0):
-    return v2.ColorJitter(brightness=brightness, contrast=contrast)(x), y
+    """Colour channels only; an extra segmentation channel passes through."""
+    return torch.cat([v2.ColorJitter(brightness=brightness, contrast=contrast)(x[:3]), x[3:]]), y
 
 
 def normalize(x, y, mean: list = IMAGENET_MEAN, std: list = IMAGENET_STD):
-    return TF.normalize(x, mean, std), y
+    """Colour channels only; an extra segmentation channel stays in [0, 1]."""
+    return torch.cat([TF.normalize(x[:3], mean, std), x[3:]]), y
 
 
 def _apply(transforms: list, x, y):

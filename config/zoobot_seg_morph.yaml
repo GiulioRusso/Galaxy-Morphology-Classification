@@ -1,0 +1,63 @@
+# Zoobot + segmentation channel + morphology measurements (needs scripts/segment.py first).
+# The segmentation map (sky / other source / galaxy) is a 4th input channel: nothing is removed from the image.
+# The 30 morphology measurements (net/data/morphology.py) join the pooled image features before the classifier.
+# Ablations (same config, one part off):
+#   segmentation only: uv run scripts/main.py config/zoobot_seg_morph.yaml name=zoobot_seg title="Zoobot + segmentation channel" data.morphology=null model.extra_features=0
+#   morphology only:   uv run scripts/main.py config/zoobot_seg_morph.yaml name=zoobot_morph title="Zoobot + morphology" data.segmaps=null model.in_chans=3
+# Everything else as zoobot.yaml.
+framework: dl
+name: null                # experiment folder suffix; null = this file name
+title: "Zoobot + segmentation channel + morphology"
+output_dir: experiments
+seed: 0                   # initialisation and data order
+deterministic: false
+device: auto              # auto | cpu | cuda | mps
+mps_memory_fraction: 0.4  # Apple silicon: cap GPU memory so overuse raises an error instead of freezing macOS
+
+data:
+  images: data/Galaxy10_DECals.npy
+  split: splits/galaxy10.csv
+  limit: null             # images per split, for quick debugging
+  sampler: true           # class-balanced WeightedRandomSampler for training
+  segmaps: data/segmaps.npy        # 4th input channel; null = RGB only
+  morphology: data/morphology.npz  # measurements fused into the head; null = none
+  batch_size: 32
+  num_workers: 3
+
+transforms:               # functions in net/data/transforms/transforms.py, applied in order
+  train:
+    - {name: to_tensor}
+    - {name: d4}
+    - {name: random_crop, size: 224}
+    - {name: color_jitter, brightness: 0.1, contrast: 0.1}
+    - {name: normalize}
+  eval:                   # validation + test
+    - {name: to_tensor}
+    - {name: center_crop, size: 224}
+    - {name: normalize}
+
+model:                    # keyword arguments of net.model.model.Net (any timm model name)
+  name: hf_hub:mwalmsley/zoobot-encoder-convnext_tiny
+  num_classes: 10
+  pretrained: true
+  grad_checkpointing: true
+  in_chans: 4             # RGB + segmentation
+  extra_features: 30      # len(net.data.morphology.NAMES); 0 = no fusion
+
+loss: {name: CrossEntropyLoss}
+optimizer: {name: AdamW, lr: 1.0e-4, weight_decay: 0.05}
+scheduler: {name: CosineAnnealingLR, T_max: 30}
+
+train:
+  epochs: 30
+  monitor: val_macro_f1   # logs/log_epoch.csv column that selects best.pt
+  mode: max
+  patience: null          # early stop after this many epochs without improvement; null = full schedule
+  amp: true               # float16 autocast on mps / cuda
+  resume: null            # e.g. experiments/<run>/checkpoints.nosync/last.pt
+  resume_optimizer: false # true = also optimizer, scheduler, epoch counter
+
+inference:
+  checkpoint: null        # set to this run's best.pt when training ends
+  split: test
+  after_train: true       # test the best checkpoint right after training

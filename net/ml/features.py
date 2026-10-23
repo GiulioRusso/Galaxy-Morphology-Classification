@@ -100,6 +100,15 @@ def compute(images_path, ids, workers=None):
 
 
 def features(cfg: dict, ids) -> np.ndarray:
+    """Handcrafted features for image ids, plus the morphology measurements when data.morphology is set."""
+    X = handcrafted(cfg, ids)
+    if cfg["data"].get("morphology"):
+        from net.data import morphology
+        X = np.hstack([X, morphology.load(resolve(cfg["data"]["morphology"]), ids)])
+    return X
+
+
+def handcrafted(cfg: dict, ids) -> np.ndarray:
     """Feature matrix for image ids. data.features_cache holds every image of the split CSV (input data, like
     the .npy), so it is computed once (~2 min on 8 processes) and shared by all runs."""
     images, cache = resolve(cfg["data"]["images"]), resolve(cfg["data"]["features_cache"])
@@ -112,4 +121,4 @@ def features(cfg: dict, ids) -> np.ndarray:
     all_ids = pd.read_csv(resolve(cfg["data"]["split"])).image_id.to_numpy()
     logger.info(f"computing handcrafted features for {len(all_ids)} images -> {relative_to_root(cache)}")
     np.savez(cache, ids=all_ids, X=compute(images, all_ids, cfg["data"]["workers"]))
-    return features(cfg, ids)
+    return handcrafted(cfg, ids)

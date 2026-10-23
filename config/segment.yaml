@@ -1,0 +1,11 @@
+# Segment every galaxy and measure its morphology, once (~20 min on 8 processes). See net/data/segmentation.py.
+#   uv run scripts/segment.py config/segment.yaml
+images: data/Galaxy10_DECals.npy
+split: splits/galaxy10.csv
+segmaps: data/segmaps.npy           # uint8, indexed by image_id: 0 sky, 1 other source, 2 target galaxy
+morphology: data/morphology.npz     # measurements per image (net/data/morphology.py NAMES)
+workers: 8                          # processes (one thread each); keep below the core count
+segmentation:                       # keyword arguments of net.data.segmentation.segment
+  nsigma: 1.5                       # detection threshold above the sky noise
+  npixels: 20                       # minimum source size
+  contrast: 0.05                    # deblending: lower splits more (cuts arms off), higher merges companions

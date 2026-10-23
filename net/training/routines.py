@@ -17,10 +17,10 @@ def run_epoch(model, loader, loss_fn, device, optimizer=None, scaler=None, amp=F
     total, n, probs, labels = 0.0, 0, [], []
     with torch.set_grad_enabled(training):
         bar = tqdm(loader, desc="train" if training else "eval", leave=False, dynamic_ncols=True, disable=None)
-        for i, (x, y) in enumerate(bar):
-            x, y = x.to(device), y.to(device)
+        for i, (*xs, y) in enumerate(bar):  # (image, label) or (image, measurements, label)
+            xs, y = [x.to(device) for x in xs], y.to(device)
             with torch.autocast(device.type, dtype=torch.float16, enabled=amp):
-                out = model(x)
+                out = model(*xs)
             out = out.float()
             loss = loss_fn(out, y) if loss_fn is not None else torch.tensor(float("nan"))
             if training:
@@ -33,7 +33,7 @@ def run_epoch(model, loader, loss_fn, device, optimizer=None, scaler=None, amp=F
             else:
                 probs.append(F.softmax(out, 1).cpu())
                 labels.append(y.cpu())
-            total, n = total + loss.item() * len(x), n + len(x)
+            total, n = total + loss.item() * len(y), n + len(y)
     if training:
         return total / n, None, None
     return total / n, torch.cat(probs).numpy(), torch.cat(labels).numpy()

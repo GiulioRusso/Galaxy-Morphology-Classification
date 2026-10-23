@@ -63,6 +63,10 @@ Dropped (121): 118 identical, conflicting labels, 3 blank. List: `splits/dropped
 | `resnet50_{wce,focal,sampler}.yaml` | ResNet-50 (ImageNet), one config per imbalance strategy |
 | `convnext_tiny.yaml` | ConvNeXt-Tiny (ImageNet-12k→1k) |
 | `zoobot.yaml` | [Zoobot](https://github.com/mwalmsley/zoobot) ConvNeXt-Tiny (pretrained on Galaxy Zoo); same architecture as ConvNeXt-Tiny, different pretraining |
+| `handcrafted_morph_hgb.yaml` | Handcrafted features + 30 morphology measurements + gradient boosting |
+| `zoobot_seg_morph.yaml` | Zoobot with the segmentation map as a 4th input channel and the morphology measurements fused into the classifier |
+
+**Segmentation and morphology** (`net/data/segmentation.py`, `net/data/morphology.py`). Each cutout is segmented with standard astronomical source detection (photutils): smooth, threshold at 1.5σ above the sky noise, deblend, and label every pixel as sky, target galaxy (the source at the centre) or other source (stars, neighbours). The threshold follows the sky noise, so faint arms and tidal tails stay in the galaxy region. On that region, [statmorph](https://statmorph.readthedocs.io) measures concentration, asymmetry, smoothness, Gini, M20, Sérsic index and related statistics, and azimuthal Fourier modes give lopsidedness (m=1), bar and two-arm strength (m=2) and higher-order arm structure (m=3, 4) in three radial annuli. All values are rotation invariant. The map is given to the network as an extra channel, so nothing is removed from the image.
 
 ## Results
 
@@ -108,14 +112,15 @@ Requires [uv](https://docs.astral.sh/uv/). Configs are sized for a 16 GB Apple-s
 
 ```bash
 uv sync
-launch/prepare.sh                                                     # download (2.7 GB) + .npy; the split is committed in splits/
+launch/prepare.sh                                                     # download (2.7 GB), .npy, segmentation + morphology (~25 min)
 launch/train.sh config/handcrafted_hgb.yaml config/resnet50_*.yaml    # baseline + imbalance study
 launch/train.sh config/convnext_tiny.yaml config/zoobot.yaml
+launch/train.sh config/handcrafted_morph_hgb.yaml config/zoobot_seg_morph.yaml
 ```
 
 `launch/` holds every entry point:
 
-- `prepare.sh`: download the data and build the `.npy`.
+- `prepare.sh`: download the data, build the `.npy`, segment and measure every galaxy.
 - `train.sh`: train and test each config in turn, stop a run if macOS memory gets low, and regenerate the tables in this README.
 - `inference.sh`: test a trained run again.
 - `test.sh`: lint and unit tests; `--debug` adds a 1-epoch run on 128 real images.
