@@ -11,7 +11,7 @@ Walmsley et al. (2024, App. D.4) state the problem directly: published Galaxy10 
 | Walmsley et al. 2024, *Scaling Laws for Galaxy Images* ([arXiv:2404.02973](https://arxiv.org/abs/2404.02973), App. D.4) | Zoobot ConvNeXt | Galaxy Zoo (GZ Evo) + ImageNet-12k | ≈90 | Fine-tuning and linear probe; split not canonical | Closest to our B3, but split differs |
 | Multimodal Universe 2024 ([arXiv:2412.02527](https://arxiv.org/abs/2412.02527), Table 3, App. B.1) | ConvNeXt-Nano | Galaxy Zoo / ImageNet-12k / none | 89.3 ± 0.1 / 83.9 ± 0.3 / 75.6 ± 1.8 | 80/20 train/test, ~15k galaxies re-rendered from Legacy Survey images (different pixels from the h5) | No: different images and split |
 | Same paper | EfficientNetB0 / ResNet18 / DenseNet121 | none | 80.9 / 73.9 / 73.5 | 80/20, 10 epochs | No |
-| Lagman, Naval & Reyes 2024 (SPP conf., [arXiv:2606.08826](https://arxiv.org/abs/2606.08826)) | ResNet101 / InceptionV4 | not stated | 89.4 / 88.7 | **Offline rotations/flips used to balance classes to 2,500 images each.** The paper does not say whether this happened before or after splitting; if before, it has the same leak as our v1 | No: possible leakage |
+| Lagman, Naval & Reyes 2024 (SPP conf., [arXiv:2606.08826](https://arxiv.org/abs/2606.08826)) | ResNet101 / InceptionV4 | not stated | 89.4 / 88.7 | **Offline rotations/flips used to balance classes to 2,500 images each.** The paper does not say whether this happened before or after splitting; if before, rotated copies of training galaxies can end up in the test set | No: possible leakage |
 
 ## How our protocol differs
 
