@@ -13,3 +13,4 @@ __pycache__/
 experiments/*.log
 wandb/
 .ipynb_checkpoints/
+notes/

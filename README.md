@@ -12,7 +12,33 @@ This repository is a revised version of a university course project (Machine and
 
 ## Task
 
-Given a colour image of a galaxy, predict its morphological class: smooth (round, in-between, cigar), spiral (barred, tight, loose), edge-on (with or without bulge), disturbed or merging. Morphology traces how a galaxy formed and evolved, and modern surveys image far more galaxies than people can label, so automatic classification is needed at scale.
+**Input:** one colour image of a galaxy (256×256 pixels, galaxy at the centre). **Output:** one of 10 morphological classes.
+
+Morphology, the visible shape of a galaxy, traces how it formed and evolved: smooth ellipticals are old and quiescent, spirals are still forming stars, bars drive gas to the centre, and disturbed or merging galaxies are being reshaped by interactions. Modern surveys image millions of galaxies, far more than people can label, so classification has to be automatic.
+
+| Class | What it looks like |
+|---|---|
+| Disturbed | irregular, asymmetric shape, often with tidal features |
+| Merging | two or more galaxies interacting or overlapping |
+| Round Smooth | smooth, featureless, circular |
+| In-between Round Smooth | smooth, slightly elongated |
+| Cigar Shaped Smooth | smooth, strongly elongated |
+| Barred Spiral | spiral with a straight bar through the centre |
+| Unbarred Tight Spiral | spiral arms wound tightly around the centre |
+| Unbarred Loose Spiral | spiral arms wound loosely, open structure |
+| Edge-on no Bulge | thin disk seen side-on |
+| Edge-on with Bulge | disk seen side-on with a central bulge |
+
+**Why it is hard.**
+- **Neighbouring classes overlap.** Labels are thresholds on volunteer votes, so Disturbed vs Merging and tight vs loose spiral are partly a matter of degree.
+- **Imbalance.** Cigar Shaped Smooth has 334 images, Round Smooth 2,645.
+- **Faint, decisive detail.** Bars, arm winding and tidal tails are small or low-contrast compared with the bright galaxy core.
+- **Orientation carries no information.** A galaxy has no "up", so the model must give the same answer for any rotation or flip.
+
+**Questions this repository answers**, on one protocol (see below):
+1. How far do handcrafted features, ImageNet-pretrained CNNs and a galaxy-pretrained encoder get, measured with macro-F1 on a cleaned, grouped split?
+2. Do physical morphology measurements of the segmented galaxy (concentration, asymmetry, bar and arm strength) add information that the networks miss?
+3. How much do protocol choices (split, metric) change the reported numbers?
 
 ## Dataset
 
