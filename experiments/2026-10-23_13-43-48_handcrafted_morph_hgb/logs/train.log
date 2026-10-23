@@ -1,0 +1,3 @@
+2026-10-23 13:43:48 | INFO    | experiment: experiments/2026-10-23_13-43-48_handcrafted_morph_hgb
+2026-10-23 13:43:49 | INFO    | train=12330 val=2645 features=145
+2026-10-23 13:44:06 | INFO    | done: 78 iterations, val macro_f1=0.7656

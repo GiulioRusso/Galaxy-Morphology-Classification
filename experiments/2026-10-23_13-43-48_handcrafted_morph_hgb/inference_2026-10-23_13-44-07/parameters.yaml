@@ -1,0 +1,27 @@
+# reproduce: uv run scripts/main.py experiments/2026-10-23_13-43-48_handcrafted_morph_hgb/inference_2026-10-23_13-44-07/parameters.yaml
+# command:   uv run scripts/main.py config/handcrafted_morph_hgb.yaml
+# git:       6110760 (dirty)
+# python:    3.11.15 on macOS-26.6.2-arm64-arm-64bit
+
+framework: ml
+name: handcrafted_morph_hgb
+title: Handcrafted + morphology features + gradient boosting
+output_dir: experiments
+seed: 0
+deterministic: false
+data:
+  images: data/Galaxy10_DECals.npy
+  split: splits/galaxy10.csv
+  limit: null
+  features_cache: data/features.npz
+  morphology: data/morphology.npz
+  workers: null
+model:
+  learning_rate: 0.05
+  max_iter: 1000
+  class_weight: balanced
+  early_stopping: true
+inference:
+  checkpoint: experiments/2026-10-23_13-43-48_handcrafted_morph_hgb/checkpoints.nosync/model.joblib
+  split: test
+  after_train: true

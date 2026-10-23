@@ -1,0 +1,2 @@
+2026-10-23 13:44:07 | INFO    | experiment: experiments/2026-10-23_13-43-48_handcrafted_morph_hgb/inference_2026-10-23_13-44-07
+2026-10-23 13:44:08 | INFO    | test: macro_f1=0.7412  per-class F1: 0.363 0.751 0.912 0.886 0.717 0.779 0.670 0.576 0.861 0.896

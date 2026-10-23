@@ -2,6 +2,7 @@
 
     uv run scripts/preprocess.py config/preprocess.yaml
     # -> data/Galaxy10_DECals.npy + splits/galaxy10.csv + splits/dropped.csv
+    #    + splits/galaxy10_random.csv (standard random split of all images, for the protocol comparison only)
 
 image_id is the row index in Galaxy10_DECals.h5 and never changes (no renaming).
 The h5 is gzip-chunked across 555 images per chunk, so reading one image decompresses ~100 MB;
@@ -102,3 +103,8 @@ def prepare(h5_path, splits_dir, seed=0, radius_arcsec=GROUP_RADIUS_ARCSEC):
                            split=make_split(labels[keep], groups, seed)))
     df.to_csv(Path(splits_dir) / "galaxy10.csv", index=False)
     logger.info(f"split (seed {seed}): {df.split.value_counts().to_dict()}")
+
+    # standard protocol of published work, only for the protocol comparison: every image, no cleaning, random by image
+    ids = np.arange(len(labels))
+    pd.DataFrame(dict(image_id=ids, label=labels, group=ids, split=make_split(labels, ids, seed))).to_csv(
+        Path(splits_dir) / "galaxy10_random.csv", index=False)

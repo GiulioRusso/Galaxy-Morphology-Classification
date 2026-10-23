@@ -25,3 +25,10 @@ def test_fake_splits(fake):
     assert not df.image_id.isin(BLACK + list(TWIN)).any()
     assert pd.read_csv(fake["splits"] / "dropped.csv").image_id.tolist() == sorted(BLACK + list(TWIN))
     assert df.set_index("image_id").loc[list(DUP), "split"].nunique() == 1
+
+
+def test_random_split_is_the_standard_protocol(fake):
+    """Every image (duplicates included), split by image: the protocol of published work."""
+    df = pd.read_csv(fake["splits"] / "galaxy10_random.csv")
+    assert len(df) == len(fake["labels"]) and set(df.split) == {"train", "val", "test"}
+    assert df.group.is_unique

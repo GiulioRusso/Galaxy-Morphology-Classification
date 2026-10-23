@@ -76,6 +76,7 @@ One run per model (seed 0), 10 classes, test set. Validation macro-F1 is the bes
 | Model | Test macro-F1 | Val macro-F1 |
 |---|---|---|
 | ConvNeXt-Tiny (ImageNet-12k→1k) | 0.854 | 0.863 |
+| Handcrafted + morphology features + gradient boosting | 0.741 | 0.767 |
 | Handcrafted features + gradient boosting | 0.711 | 0.720 |
 | ResNet-50 (ImageNet), balanced sampler | 0.859 | 0.859 |
 | ResNet-50 (ImageNet), focal loss | 0.863 | 0.859 |
@@ -86,25 +87,31 @@ One run per model (seed 0), 10 classes, test set. Validation macro-F1 is the bes
 Per-class test F1:
 
 <!-- PERCLASS:START -->
-| Class | convnext_tiny | handcrafted_hgb | resnet50_sampler | resnet50_focal | resnet50_wce | zoobot |
-|---|---|---|---|---|---|---|
-| 0 Disturbed | 0.542 | 0.358 | 0.611 | 0.634 | 0.616 | 0.620 |
-| 1 Merging | 0.906 | 0.707 | 0.919 | 0.907 | 0.903 | 0.917 |
-| 2 Round Smooth | 0.940 | 0.899 | 0.930 | 0.947 | 0.945 | 0.945 |
-| 3 In-between Round Smooth | 0.923 | 0.864 | 0.929 | 0.935 | 0.929 | 0.937 |
-| 4 Cigar Shaped Smooth | 0.817 | 0.686 | 0.815 | 0.815 | 0.860 | 0.800 |
-| 5 Barred Spiral | 0.924 | 0.682 | 0.918 | 0.922 | 0.907 | 0.921 |
-| 6 Unbarred Tight Spiral | 0.804 | 0.640 | 0.795 | 0.783 | 0.796 | 0.800 |
-| 7 Unbarred Loose Spiral | 0.781 | 0.538 | 0.785 | 0.783 | 0.782 | 0.777 |
-| 8 Edge-on no Bulge | 0.933 | 0.847 | 0.926 | 0.940 | 0.922 | 0.916 |
-| 9 Edge-on with Bulge | 0.968 | 0.894 | 0.959 | 0.964 | 0.960 | 0.970 |
+| Class | convnext_tiny | handcrafted_morph_hgb | handcrafted_hgb | resnet50_sampler | resnet50_focal | resnet50_wce | zoobot |
+|---|---|---|---|---|---|---|---|
+| 0 Disturbed | 0.542 | 0.363 | 0.358 | 0.611 | 0.634 | 0.616 | 0.620 |
+| 1 Merging | 0.906 | 0.751 | 0.707 | 0.919 | 0.907 | 0.903 | 0.917 |
+| 2 Round Smooth | 0.940 | 0.912 | 0.899 | 0.930 | 0.947 | 0.945 | 0.945 |
+| 3 In-between Round Smooth | 0.923 | 0.886 | 0.864 | 0.929 | 0.935 | 0.929 | 0.937 |
+| 4 Cigar Shaped Smooth | 0.817 | 0.717 | 0.686 | 0.815 | 0.815 | 0.860 | 0.800 |
+| 5 Barred Spiral | 0.924 | 0.779 | 0.682 | 0.918 | 0.922 | 0.907 | 0.921 |
+| 6 Unbarred Tight Spiral | 0.804 | 0.670 | 0.640 | 0.795 | 0.783 | 0.796 | 0.800 |
+| 7 Unbarred Loose Spiral | 0.781 | 0.576 | 0.538 | 0.785 | 0.783 | 0.782 | 0.777 |
+| 8 Edge-on no Bulge | 0.933 | 0.861 | 0.847 | 0.926 | 0.940 | 0.922 | 0.916 |
+| 9 Edge-on with Bulge | 0.968 | 0.896 | 0.894 | 0.959 | 0.964 | 0.960 | 0.970 |
 <!-- PERCLASS:END -->
 
 Error analysis (most-confused class pairs with examples): [`notebooks/error_analysis.ipynb`](notebooks/error_analysis.ipynb).
 
 ## Comparison with published work
 
-Published Galaxy10 DECaLS results report top-1 accuracy (about 73% to 95%), while we report macro-F1. None of them uses a duplicate-aware split, and the splits are not shared. The numbers are therefore **not comparable**. The table, protocols and caveats are in [`docs/related_work.md`](docs/related_work.md). In particular, the Zoobot encoder was pretrained on Galaxy Zoo votes that very likely include our test galaxies.
+Published Galaxy10 DECaLS results report top-1 accuracy (about 73% to 95%) on random splits of all images, while we report macro-F1 on a cleaned, grouped split. None of them uses a duplicate-aware split, and the splits are not shared. The table, protocols and caveats are in [`docs/related_work.md`](docs/related_work.md). In particular, the Zoobot encoder was pretrained on Galaxy Zoo votes that very likely include our test galaxies.
+
+To compare on equal terms, the same config is also trained on the **standard protocol**: a random 70/15/15 split by image of all 17,736 images, with no cleaning (`splits/galaxy10_random.csv`). The gap between the two columns is how much the standard protocol inflates scores:
+
+<!-- PROTOCOL:START -->
+_No runs on the standard split yet: see Reproduce._
+<!-- PROTOCOL:END -->
 
 ## Reproduce
 
@@ -116,6 +123,7 @@ launch/prepare.sh                                                     # download
 launch/train.sh config/handcrafted_hgb.yaml config/resnet50_*.yaml    # baseline + imbalance study
 launch/train.sh config/convnext_tiny.yaml config/zoobot.yaml
 launch/train.sh config/handcrafted_morph_hgb.yaml config/zoobot_seg_morph.yaml
+uv run scripts/main.py config/zoobot.yaml data.split=splits/galaxy10_random.csv name=zoobot_random_split   # protocol comparison
 ```
 
 `launch/` holds every entry point:
