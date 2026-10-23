@@ -1,0 +1,14 @@
+2026-10-23 16:23:25 | INFO    | experiment: experiments/2026-10-23_16-23-24_zoobot_seg_morph
+2026-10-23 16:23:26 | INFO    | resumed from experiments/2026-10-23_13-44-12_zoobot_seg_morph/checkpoints.nosync/last.pt (full state), starting at epoch 21
+2026-10-23 16:23:26 | INFO    | device=mps amp=True train=12330 val=2645 class counts=[736, 1285, 1845, 1415, 233, 1427, 1273, 1818, 993, 1305]
+2026-10-23 16:28:29 | INFO    | epoch 021/30  train_loss=0.0151  val_loss=0.6401  val_macro_f1=0.8591  lr=2.5e-05  (302s)
+2026-10-23 16:34:11 | INFO    | epoch 022/30  train_loss=0.0108  val_loss=0.5982  val_macro_f1=0.8715  lr=2.06e-05  (341s)  *best*
+2026-10-23 16:40:12 | INFO    | epoch 023/30  train_loss=0.0071  val_loss=0.6335  val_macro_f1=0.8654  lr=1.65e-05  (360s)
+2026-10-23 16:46:15 | INFO    | epoch 024/30  train_loss=0.0070  val_loss=0.6692  val_macro_f1=0.8650  lr=1.28e-05  (362s)
+2026-10-23 16:52:21 | INFO    | epoch 025/30  train_loss=0.0045  val_loss=0.6510  val_macro_f1=0.8648  lr=9.55e-06  (365s)
+2026-10-23 16:58:31 | INFO    | epoch 026/30  train_loss=0.0024  val_loss=0.6536  val_macro_f1=0.8696  lr=6.7e-06  (368s)
+2026-10-23 17:04:43 | INFO    | epoch 027/30  train_loss=0.0025  val_loss=0.6755  val_macro_f1=0.8620  lr=4.32e-06  (371s)
+2026-10-23 17:10:58 | INFO    | epoch 028/30  train_loss=0.0023  val_loss=0.6748  val_macro_f1=0.8612  lr=2.45e-06  (374s)
+2026-10-23 17:17:15 | INFO    | epoch 029/30  train_loss=0.0016  val_loss=0.6761  val_macro_f1=0.8626  lr=1.09e-06  (377s)
+2026-10-23 17:23:28 | INFO    | epoch 030/30  train_loss=0.0018  val_loss=0.6893  val_macro_f1=0.8624  lr=2.74e-07  (372s)
+2026-10-23 17:23:28 | INFO    | done: best val_macro_f1=0.8715

@@ -107,24 +107,25 @@ One run per model (seed 0), 10 classes, test set. Validation macro-F1 is the bes
 | ResNet-50 (ImageNet), balanced sampler | 0.859 | 0.859 |
 | ResNet-50 (ImageNet), focal loss | 0.863 | 0.859 |
 | ResNet-50 (ImageNet), weighted cross-entropy | 0.862 | 0.859 |
+| Zoobot + segmentation channel + morphology | 0.861 | 0.872 |
 | Zoobot ConvNeXt-Tiny (Galaxy Zoo) | 0.860 | 0.872 |
 <!-- RESULTS:END -->
 
 Per-class test F1:
 
 <!-- PERCLASS:START -->
-| Class | convnext_tiny | handcrafted_morph_hgb | handcrafted_hgb | resnet50_sampler | resnet50_focal | resnet50_wce | zoobot |
-|---|---|---|---|---|---|---|---|
-| 0 Disturbed | 0.542 | 0.363 | 0.358 | 0.611 | 0.634 | 0.616 | 0.620 |
-| 1 Merging | 0.906 | 0.751 | 0.707 | 0.919 | 0.907 | 0.903 | 0.917 |
-| 2 Round Smooth | 0.940 | 0.912 | 0.899 | 0.930 | 0.947 | 0.945 | 0.945 |
-| 3 In-between Round Smooth | 0.923 | 0.886 | 0.864 | 0.929 | 0.935 | 0.929 | 0.937 |
-| 4 Cigar Shaped Smooth | 0.817 | 0.717 | 0.686 | 0.815 | 0.815 | 0.860 | 0.800 |
-| 5 Barred Spiral | 0.924 | 0.779 | 0.682 | 0.918 | 0.922 | 0.907 | 0.921 |
-| 6 Unbarred Tight Spiral | 0.804 | 0.670 | 0.640 | 0.795 | 0.783 | 0.796 | 0.800 |
-| 7 Unbarred Loose Spiral | 0.781 | 0.576 | 0.538 | 0.785 | 0.783 | 0.782 | 0.777 |
-| 8 Edge-on no Bulge | 0.933 | 0.861 | 0.847 | 0.926 | 0.940 | 0.922 | 0.916 |
-| 9 Edge-on with Bulge | 0.968 | 0.896 | 0.894 | 0.959 | 0.964 | 0.960 | 0.970 |
+| Class | convnext_tiny | handcrafted_morph_hgb | handcrafted_hgb | resnet50_sampler | resnet50_focal | resnet50_wce | zoobot_seg_morph | zoobot |
+|---|---|---|---|---|---|---|---|---|
+| 0 Disturbed | 0.542 | 0.363 | 0.358 | 0.611 | 0.634 | 0.616 | 0.629 | 0.620 |
+| 1 Merging | 0.906 | 0.751 | 0.707 | 0.919 | 0.907 | 0.903 | 0.924 | 0.917 |
+| 2 Round Smooth | 0.940 | 0.912 | 0.899 | 0.930 | 0.947 | 0.945 | 0.944 | 0.945 |
+| 3 In-between Round Smooth | 0.923 | 0.886 | 0.864 | 0.929 | 0.935 | 0.929 | 0.929 | 0.937 |
+| 4 Cigar Shaped Smooth | 0.817 | 0.717 | 0.686 | 0.815 | 0.815 | 0.860 | 0.816 | 0.800 |
+| 5 Barred Spiral | 0.924 | 0.779 | 0.682 | 0.918 | 0.922 | 0.907 | 0.927 | 0.921 |
+| 6 Unbarred Tight Spiral | 0.804 | 0.670 | 0.640 | 0.795 | 0.783 | 0.796 | 0.801 | 0.800 |
+| 7 Unbarred Loose Spiral | 0.781 | 0.576 | 0.538 | 0.785 | 0.783 | 0.782 | 0.766 | 0.777 |
+| 8 Edge-on no Bulge | 0.933 | 0.861 | 0.847 | 0.926 | 0.940 | 0.922 | 0.908 | 0.916 |
+| 9 Edge-on with Bulge | 0.968 | 0.896 | 0.894 | 0.959 | 0.964 | 0.960 | 0.969 | 0.970 |
 <!-- PERCLASS:END -->
 
 Error analysis (most-confused class pairs with examples): [`notebooks/error_analysis.ipynb`](notebooks/error_analysis.ipynb).

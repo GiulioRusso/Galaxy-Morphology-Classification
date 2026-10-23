@@ -1,0 +1,2 @@
+2026-10-23 17:23:58 | INFO    | experiment: experiments/2026-10-23_16-23-24_zoobot_seg_morph/inference_2026-10-23_17-23-58
+2026-10-23 17:24:31 | INFO    | test: macro_f1=0.8615  per-class F1: 0.629 0.924 0.944 0.929 0.816 0.927 0.801 0.766 0.908 0.969
