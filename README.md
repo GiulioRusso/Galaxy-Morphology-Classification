@@ -5,7 +5,7 @@ Classifying galaxy images into 10 morphological classes on Galaxy10 DECaLS, comp
 This repository is a revised version of a university course project (Machine and Deep Learning, 2023). The original project is kept on branch [`legacy/v1`](https://github.com/GiulioRusso/Galaxy-Morphology-Classification/tree/legacy/v1) (tag `v1-coursework`).
 
 <!-- HEADLINE:START -->
-**Best model (by validation macro-F1): ConvNeXt-Tiny (ImageNet-12k→1k). Test macro-F1 0.854 on all 10 classes.**
+**Best model (by validation macro-F1): Zoobot ConvNeXt-Tiny (Galaxy Zoo). Test macro-F1 0.860 on all 10 classes.**
 <!-- HEADLINE:END -->
 
 <img src="./images/galaxy10_example.png">
@@ -76,23 +76,24 @@ One run per model (seed 0), 10 classes, test set. Validation macro-F1 is the bes
 | ResNet-50 (ImageNet), balanced sampler | 0.859 | 0.859 |
 | ResNet-50 (ImageNet), focal loss | 0.863 | 0.859 |
 | ResNet-50 (ImageNet), weighted cross-entropy | 0.862 | 0.859 |
+| Zoobot ConvNeXt-Tiny (Galaxy Zoo) | 0.860 | 0.872 |
 <!-- RESULTS:END -->
 
 Per-class test F1:
 
 <!-- PERCLASS:START -->
-| Class | convnext_tiny | handcrafted_hgb | resnet50_sampler | resnet50_focal | resnet50_wce |
-|---|---|---|---|---|---|
-| 0 Disturbed | 0.542 | 0.358 | 0.611 | 0.634 | 0.616 |
-| 1 Merging | 0.906 | 0.707 | 0.919 | 0.907 | 0.903 |
-| 2 Round Smooth | 0.940 | 0.899 | 0.930 | 0.947 | 0.945 |
-| 3 In-between Round Smooth | 0.923 | 0.864 | 0.929 | 0.935 | 0.929 |
-| 4 Cigar Shaped Smooth | 0.817 | 0.686 | 0.815 | 0.815 | 0.860 |
-| 5 Barred Spiral | 0.924 | 0.682 | 0.918 | 0.922 | 0.907 |
-| 6 Unbarred Tight Spiral | 0.804 | 0.640 | 0.795 | 0.783 | 0.796 |
-| 7 Unbarred Loose Spiral | 0.781 | 0.538 | 0.785 | 0.783 | 0.782 |
-| 8 Edge-on no Bulge | 0.933 | 0.847 | 0.926 | 0.940 | 0.922 |
-| 9 Edge-on with Bulge | 0.968 | 0.894 | 0.959 | 0.964 | 0.960 |
+| Class | convnext_tiny | handcrafted_hgb | resnet50_sampler | resnet50_focal | resnet50_wce | zoobot |
+|---|---|---|---|---|---|---|
+| 0 Disturbed | 0.542 | 0.358 | 0.611 | 0.634 | 0.616 | 0.620 |
+| 1 Merging | 0.906 | 0.707 | 0.919 | 0.907 | 0.903 | 0.917 |
+| 2 Round Smooth | 0.940 | 0.899 | 0.930 | 0.947 | 0.945 | 0.945 |
+| 3 In-between Round Smooth | 0.923 | 0.864 | 0.929 | 0.935 | 0.929 | 0.937 |
+| 4 Cigar Shaped Smooth | 0.817 | 0.686 | 0.815 | 0.815 | 0.860 | 0.800 |
+| 5 Barred Spiral | 0.924 | 0.682 | 0.918 | 0.922 | 0.907 | 0.921 |
+| 6 Unbarred Tight Spiral | 0.804 | 0.640 | 0.795 | 0.783 | 0.796 | 0.800 |
+| 7 Unbarred Loose Spiral | 0.781 | 0.538 | 0.785 | 0.783 | 0.782 | 0.777 |
+| 8 Edge-on no Bulge | 0.933 | 0.847 | 0.926 | 0.940 | 0.922 | 0.916 |
+| 9 Edge-on with Bulge | 0.968 | 0.894 | 0.959 | 0.964 | 0.960 | 0.970 |
 <!-- PERCLASS:END -->
 
 Error analysis (most-confused class pairs with examples): [`notebooks/error_analysis.ipynb`](notebooks/error_analysis.ipynb).
